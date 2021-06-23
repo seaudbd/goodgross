@@ -1,0 +1,12 @@
+did u fix this note: 
+For business registration need to add:
+1. Reenter Email address.
+2. Include for business type retail or wholesale "Both" too.
+3. We need some kind of way of  verification like im not robot?
+4. Can u change show password eye like in image below.
+
+
+Personal registration looks fine but:
+1. Can u change show password eye like in image below.
+2. In my account change "Change to Business (Retail) to Change to Seller Personal (Retail)"
+3. In my account Change to Business remove (Wholesale). When user decides to change account to business and clicks, options pops up asking Wholesale or Retail or Both?
