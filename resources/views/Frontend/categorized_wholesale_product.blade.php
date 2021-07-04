@@ -219,18 +219,9 @@
                                             <button type="button" style="padding: 8px 15px; border: none; background-color: #cccccc; font-size: small; cursor: pointer;" id="quantity_plus">+</button>
                                         </div>
                                         <div class="d-grid gap-3 mt-4">
-                                            <button class="btn primary_btn_default" type="button" id="buy_it_now">Buy</button>
-                                            @if($addedInCart)
-                                                <button class="btn primary_btn_default" type="button" id="view_cart">View Cart</button>
-                                            @else
-                                                <button class="btn primary_btn_default" type="button" id="add_to_cart">Add to Cart</button>
-                                            @endif
-
-                                            @if($addedToWatch)
-                                                <button class="btn primary_btn_default" type="button" id="view_watch_list">View Watch List</button>
-                                            @else
-                                                <button class="btn primary_btn_default" type="button" id="add_to_watch">Add to Watch</button>
-                                            @endif
+                                            <button class="btn primary_btn_default" type="button" id="contact_seller">Contact the Seller</button>
+                                            <button class="btn primary_btn_default" type="button" id="place_order">Place an Order</button>
+                                            <button class="btn primary_btn_default" type="button" id="make_offer">Make an Offer</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-12 col-lg-12 col-xl-6 col-xxl-8 ps-xxl-4 ps-xl-4 pt-xxl-0 pt-xl-0 pt-lg-4 pt-md-4 pt-sm-0 pt-4 small">
