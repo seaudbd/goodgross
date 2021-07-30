@@ -113,18 +113,18 @@ class ProductController extends Controller
 
         $product = Product::where('id', $request->product_id)->with(['productProperties', 'account.personalAccount', 'account.businessAccount'])->first();
         $product['quantity'] = $request->quantity;
-        $pushableItem = true;
-        if (Session::get('cart_items')) {
-            foreach (Session::get('cart_items') as $item){
-                if ($item->id == $product->id){
-                    $pushableItem = false;
-                    break;
-                }
-            }
-        }
-        if ($pushableItem){
+//        $pushableItem = true;
+//        if (Session::get('cart_items')) {
+//            foreach (Session::get('cart_items') as $item){
+//                if ($item->id == $product->id){
+//                    $pushableItem = false;
+//                    break;
+//                }
+//            }
+//        }
+//        if ($pushableItem){
             Session::push('cart_items', $product);
-        }
+//        }
 
         view()->share('cartCounter', count(Session::get('cart_items')));
         return response()->json(['success' => true, 'message' => 'Product added to Cart successfully', 'data' => count(Session::get('cart_items'))]);
@@ -136,6 +136,28 @@ class ProductController extends Controller
         $watchedProduct->product_id = $request->product_id;
         $watchedProduct->save();
         return response()->json(['success' => true, 'message' => 'Product added to Watch List successfully']);
+    }
+
+
+    public function addToSession(Request $request) {
+
+        $product = Product::where('id', $request->product_id)->with(['productProperties', 'account.personalAccount', 'account.businessAccount'])->first();
+        $product['quantity'] = $request->quantity;
+//        $pushableItem = true;
+//        if (Session::get('cart_items')) {
+//            foreach (Session::get('cart_items') as $item){
+//                if ($item->id == $product->id){
+//                    $pushableItem = false;
+//                    break;
+//                }
+//            }
+//        }
+//        if ($pushableItem){
+        Session::push('session_items', $product);
+//        }
+
+
+        return response()->json(['success' => true, 'message' => 'Product added to Session successfully', 'payload' => null]);
     }
 
     public function checkAccountLoginStatus()

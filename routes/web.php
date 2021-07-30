@@ -12,6 +12,7 @@ use \App\Http\Controllers\Frontend\PostProductController;
 
 use \App\Http\Controllers\Frontend\CheckoutController;
 use \App\Http\Controllers\Frontend\CartController;
+use \App\Http\Controllers\Frontend\PlaceOrderController;
 
 
 
@@ -68,6 +69,7 @@ Route::get('category/get/filter/items', [ProductController::class, 'getFilterIte
 Route::get('product/{product_id}', [ProductController::class, 'loadProduct']);
 Route::post('product/add/to/cart', [ProductController::class, 'addToCart']);
 Route::post('product/add/to/watch', [ProductController::class, 'addToWatch']);
+Route::post('product/add/to/session', [ProductController::class, 'addToSession']);
 Route::get('product/check/account/login/status', [ProductController::class, 'checkAccountLoginStatus']);
 
 /////////////////////////////////////////////////////////Cart//////////////////////////////////////////////////////
@@ -75,6 +77,24 @@ Route::get('cart', [CartController::class, 'index']);
 Route::get('cart/add/product', [CartController::class, 'addProduct']);
 Route::get('cart/delete/product/{product_id}', [CartController::class, 'deleteProduct']);
 Route::get('cart/copy/product/to/checkout', [CartController::class, 'copyProductToCheckout']);
+
+
+
+////////////////////////////////////////////////////////////////Checkout/////////////////////////////////////////////////
+Route::get('checkout', [CheckoutController::class, 'index']);
+//Route::get('check/account/login/status', [CheckoutController::class, 'checkAccountLoginStatus']);
+//Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
+Route::post('checkout', [CheckoutController::class, 'process']);
+Route::get('checkout/initiate/paypal', [CheckoutController::class, 'initiatePaypal']);
+Route::get('checkout/initiate/stripe', [CheckoutController::class, 'initiateStripe']);
+Route::get('checkout/paypal/payment/status', [CheckoutController::class, 'paypalPaymentStatus']);
+Route::get('checkout/paypal/payment/cancel', [CheckoutController::class, 'paypalPaymentCancel']);
+Route::get('checkout/success/{order_id}', [CheckoutController::class, 'success']);
+
+
+/////////////////////////////////////////////////////////////////Place an Order////////////////////////////////////////////////////
+Route::get('place/order', [PlaceOrderController::class, 'index']);
+
 
 
 
@@ -249,7 +269,6 @@ Route::post('control/panel/miscellaneous/notification/delete/record', [Notificat
 Route::get('control/panel/sign/out', [SignInController::class, 'controlPanelSignOut'])->middleware('redirect.to.dashboard.if.authenticated');
 Route::post('control/panel/change/password', 'Admin\DashboardController@changePassword')->middleware('redirect.to.dashboard.if.authenticated');
 
-////// Cart Controller ////////////
 
 
 
@@ -261,15 +280,8 @@ Route::post('control/panel/change/password', 'Admin\DashboardController@changePa
 
 
 
-Route::get('checkout', [CheckoutController::class, 'index']);
-//Route::get('check/account/login/status', [CheckoutController::class, 'checkAccountLoginStatus']);
-//Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
-Route::post('checkout', [CheckoutController::class, 'process']);
-Route::get('checkout/initiate/paypal', [CheckoutController::class, 'initiatePaypal']);
-Route::get('checkout/initiate/stripe', [CheckoutController::class, 'initiateStripe']);
-Route::get('checkout/paypal/payment/status', [CheckoutController::class, 'paypalPaymentStatus']);
-Route::get('checkout/paypal/payment/cancel', [CheckoutController::class, 'paypalPaymentCancel']);
-Route::get('checkout/success/{order_id}', [CheckoutController::class, 'success']);
+
+
 
 
 

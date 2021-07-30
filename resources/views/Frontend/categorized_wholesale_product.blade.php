@@ -220,7 +220,7 @@
                                         </div>
                                         <div class="d-grid gap-3 mt-4">
                                             <button class="btn primary_btn_default" type="button" id="contact_seller">Contact the Seller</button>
-                                            <button class="btn primary_btn_default" type="button" id="place_order">Place an Order</button>
+                                            <button class="btn primary_btn_default" type="button" id="place_an_order">Place an Order</button>
                                             <button class="btn primary_btn_default" type="button" id="make_offer">Make an Offer</button>
                                         </div>
                                     </div>
@@ -588,7 +588,7 @@
             }
         });
 
-        $(document).on('submit', '#sign_in_form', function() {
+        $(document).on('submit', '#sign_in_form', function(event) {
 
             event.preventDefault();
 
@@ -626,7 +626,7 @@
                             success: function (token) {
                                 console.log(token);
 
-                                if (whichAction === 'buy_it_now') {
+                                if (whichAction === 'place_an_order') {
 
                                     let buyItNowFormData = new FormData();
                                     buyItNowFormData.append('_token', token);
@@ -636,16 +636,14 @@
 
                                     $.ajax({
                                         method: 'post',
-                                        url: '{{ url('product/add/to/cart') }}',
+                                        url: '{{ url('product/add/to/session') }}',
                                         data: buyItNowFormData,
                                         processData: false,
                                         contentType: false,
                                         global: false,
                                         success: function (response) {
                                             console.log(response);
-                                            $('#cart_counter').text(response.data);
-                                            $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
-                                            location = '{{ url('checkout') }}';
+                                            location = '{{ url('place/order') }}';
 
                                         },
                                         error: function (xhr) {
@@ -829,7 +827,7 @@
             });
         });
 
-        $(document).on('click', '#buy_it_now', function () {
+        $(document).on('click', '#place_an_order', function () {
 
 
             $.ajax({
@@ -859,7 +857,7 @@
                             }
                         });
                     } else {
-                        whichAction = 'buy_it_now'
+                        whichAction = 'place_an_order'
                         $('#sign_in_modal').modal('show');
                     }
                 },
