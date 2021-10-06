@@ -8,10 +8,10 @@
     <link rel="shortcut icon" href="{{ asset('storage/img/application/favicon.ico') }}">
 
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 
@@ -55,7 +55,7 @@
     {{--<script src="{{ asset('js/tinymce/tinymce.min.js') }}" type="text/javascript"></script>--}}
 
 
-    <script src="https://www.google.com/recaptcha/api.js?render={{ env('RECAPTCHA_SITE_KEY') }}"></script>
+{{--    <script src="https://www.google.com/recaptcha/api.js?render={{ env('RECAPTCHA_SITE_KEY') }}"></script>--}}
 
 
 
@@ -194,11 +194,7 @@
             display: none;
         }
 
-        /*#cart_icon::after {*/
-            /*border-right: none;*/
-            /*border-bottom: 0;*/
-            /*border-left: none;*/
-        /*}*/
+
 
         #search_input:focus {
             border-color: #ced4da;
@@ -441,7 +437,7 @@
                                             Post a Product
                                         </a>
                                     </div>
-                                    <div class="col-sm-auto" style="padding-top: 12px;">
+                                    <div class="col-sm-auto" style="padding-top: 6px;">
                                         @if( ! auth()->check() )
                                             <div class="d-inline-block">
                                                 <a href="{{ url('account/sign/in') }}" class="text-decoration-none text-white">Sign in</a>
@@ -451,8 +447,8 @@
                                             </div>
                                         @else
                                             <div class="dropdown d-inline-block">
-                                                <i class="fas fa-bell dropdown-toggle" id="notification_dropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 24px; color: #ffffff; cursor: pointer;"></i>
-                                                <span class="badge bg-danger" style="margin-left: -8px; padding: .25em .5em;">{{ count(auth()->user()->notifications->where('is_dismissed', 0)) }}</span>
+                                                <img src="{{ asset('storage/img/application/icons8-bell-48.png') }}" height="30" width="30" style="cursor: pointer;">
+                                                <span class="badge bg-danger" style="margin-left: -8px; padding: .25em .5em;">{{ count(auth()->user()->notifications->where('is_dismissed', 0)) > 0 ? count(auth()->user()->notifications->where('is_dismissed', 0)) : '' }}</span>
                                                 <ul class="dropdown-menu dropdown-menu-end" style="padding: 0; border: 0;" aria-labelledby="notification_dropdown">
                                                     @foreach(auth()->user()->notifications as $notification)
                                                         @if($notification->is_dismissed === 0)
@@ -469,10 +465,10 @@
                                                 <div class="dropdown-toggle" style="background-color: transparent; cursor: pointer;" id="user_dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                     @if(auth()->user()->avatar !== null)
                                                         <div style="padding: 1px; border-radius: 50%; border: 1px solid #ffffff;">
-                                                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" style="height: 25px; width: 25px; border-radius: 50%;">
+                                                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" style="height: 30px; width: 30px; border-radius: 50%;">
                                                         </div>
                                                     @else
-                                                        <i class="far fa-user-circle text-white" style="font-size: 24px;"></i>
+                                                        <img src="{{ asset('storage/img/application/icons8-user-32.png') }}" width="30" height="30">
                                                     @endif
                                                 </div>
                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user_dropdown">
@@ -483,7 +479,7 @@
 
                                         @endif
                                             <div class="d-inline-block ms-3">
-                                                <i class="fas fa-shopping-cart" id="cart_icon" style="font-size: 22px; color: #ffffff; cursor: pointer;"></i>
+                                                <img src="{{ asset('storage/img/application/icons8-shopping-cart-64.png') }}" id="cart" style="cursor: pointer;" width="30" height="30">
                                                 <span class="badge bg-danger" style="margin-left: -8px; padding: .25em .5em;" id="cart_counter">{{ $cartCounter > 0 ? $cartCounter : '' }}</span>
                                             </div>
                                     </div>
@@ -670,6 +666,11 @@
 
         $(document).ajaxStop(function () {
             $("#ajax_loading").fadeOut(300);
+        });
+
+
+        $(document).on('click', '#cart', function () {
+            location = '{{ url('cart') }}';
         });
 
 

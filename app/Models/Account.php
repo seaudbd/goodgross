@@ -31,4 +31,8 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function accountShippings() {
+        return $this->hasMany(AccountShipping::class);
+    }
+
 }

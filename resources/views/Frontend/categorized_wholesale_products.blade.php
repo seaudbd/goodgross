@@ -19,14 +19,14 @@
                                 @foreach($rootCategories as $rootCategory)
                                     <a href="{{ url('/') }}">{{ $rootCategory }}</a> .
                                 @endforeach
-                                {{ $category->category }} [ <span id="products_count"></span> Item(s) ]
+                                {{ $category->category }} <sub id="products_count"></sub>
                             </div>
                             <div class="col-4 text-end" style="font-size: 16px;">
                                 <div class="d-inline-block px-1 me-2 py-1" id="grid_view" style="cursor: pointer;">
-                                    <i class="fas fa-th"></i> <span style="color: #636363;">Grid</span>
+                                    <i class="fas fa-th"></i>
                                 </div>
                                 <div class="d-inline-block px-1 py-1" id="list_view" style="cursor: pointer;">
-                                    <i class="fas fa-th-list"></i> <span style="color: #636363;">List</span>
+                                    <i class="fas fa-th-list"></i>
                                 </div>
 
                             </div>
@@ -58,6 +58,17 @@
 
 
     <script type="text/javascript">
+
+
+        function isJsonString(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
+
 
         var viewLayout;
 
@@ -102,7 +113,7 @@
                 cache: false,
                 success: function (result) {
                     console.log(result);
-                    $('#products_count').text(result.length);
+                    $('#products_count').text(result.length + ' Item(s)');
 
                     $('#products_container').empty();
                     if (result.length > 0) {
@@ -171,9 +182,12 @@
                     $('#price_range_min_amount').text('$' + $('#price_range').slider('values', 0));
                     $('#price_range_max_amount').text('$' + $('#price_range').slider('values', 1 ));
                 } else {
+                    let filterValue;
                     $.each(filterItem.distinct_product_properties, function (productPropertyKey, productProperty) {
+                        filterValue = isJsonString(productProperty.value) === true ? JSON.parse(productProperty.value) : productProperty.value;
+                        console.log(filterValue);
                         $('#filter_item_' + filterItem.id).append(
-                            '<div class="form-check"><input class="form-check-input filter_input" type="checkbox" value="' + productProperty.value + '" id="filter_property_' + productProperty.value.toLowerCase().split(' ').join('_') + '"><label class="form-check-label" style="font-size: 12px;" for="filter_property_' + productProperty.value.toLowerCase().split(' ').join('_') + '">' + productProperty.value + '</label></div>'
+                            '<div class="form-check"><input class="form-check-input filter_input" type="checkbox" value="' + productProperty.value + '" id="filter_property_' + productProperty.value.toLowerCase().split(' ').join('_') + '"><label class="form-check-label" style="font-size: 12px;" for="filter_property_' + productProperty.value.toLowerCase().split(' ').join('_') + '">' + filterValue + '</label></div>'
                         );
                     });
                 }

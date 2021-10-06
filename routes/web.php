@@ -10,6 +10,7 @@ use \App\Http\Controllers\Frontend\RegistrationController;
 use \App\Http\Controllers\Frontend\EmailVerificationController;
 use \App\Http\Controllers\Frontend\PostProductController;
 
+use \App\Http\Controllers\Frontend\DeliveryAddressController;
 use \App\Http\Controllers\Frontend\CheckoutController;
 use \App\Http\Controllers\Frontend\CartController;
 use \App\Http\Controllers\Frontend\PlaceOrderController;
@@ -57,6 +58,9 @@ Route::get('regenerate/csrf/token', function() {
     return response()->json(csrf_token());
 });
 
+Route::get('check/account/login/status', [SignInController::class, 'checkAccountLoginStatus']);
+Route::get('is/shipping/address/available', [CheckoutController::class, 'isShippingAddressAvailable']);
+
 
 ////////////////////////////////////////////////////////////HOME PAGE////////////////////////////////////////////////////////////////////////////////
 Route::get('/', [HomeController::class, 'loadHomePage']);
@@ -69,22 +73,34 @@ Route::get('category/get/filter/items', [ProductController::class, 'getFilterIte
 Route::get('product/{product_id}', [ProductController::class, 'loadProduct']);
 Route::post('product/add/to/cart', [ProductController::class, 'addToCart']);
 Route::post('product/add/to/watch', [ProductController::class, 'addToWatch']);
-Route::post('product/add/to/session', [ProductController::class, 'addToSession']);
-Route::get('product/check/account/login/status', [ProductController::class, 'checkAccountLoginStatus']);
+Route::post('product/add/to/session', [ProductController::class, 'addWholesaleItemToSession']);
+
+
+////////////////////////////////////Delivery Address/////////////////////////////////////
+Route::get('delivery/address', [DeliveryAddressController::class, 'loadDeliveryAddress']);
+Route::post('delivery/address/save', [DeliveryAddressController::class, 'saveDeliveryAddress']);
 
 /////////////////////////////////////////////////////////Cart//////////////////////////////////////////////////////
 Route::get('cart', [CartController::class, 'index']);
-Route::get('cart/add/product', [CartController::class, 'addProduct']);
-Route::get('cart/delete/product/{product_id}', [CartController::class, 'deleteProduct']);
-Route::get('cart/copy/product/to/checkout', [CartController::class, 'copyProductToCheckout']);
+Route::get('cart/get/items', [CartController::class, 'getItems']);
+Route::get('cart/delete/item', [CartController::class, 'deleteItem']);
+Route::get('cart/update/item/quantity', [CartController::class, 'updateItemQuantity']);
+Route::get('cart/copy/items/to/checkout', [CartController::class, 'copyItemToCheckout']);
 
 
 
 ////////////////////////////////////////////////////////////////Checkout/////////////////////////////////////////////////
-Route::get('checkout', [CheckoutController::class, 'index']);
-//Route::get('check/account/login/status', [CheckoutController::class, 'checkAccountLoginStatus']);
+Route::get('checkout', [CheckoutController::class, 'loadCheckout']);
+
+
+Route::get('checkout/get/items', [CheckoutController::class, 'getItems']);
+Route::get('checkout/get/delivery/addresses', [CheckoutController::class, 'getDeliveryAddresses']);
+Route::get('checkout/get/delivery/address', [CheckoutController::class, 'getDeliveryAddress']);
+Route::get('checkout/select/delivery/address', [CheckoutController::class, 'selectDeliveryAddress']);
+Route::get('checkout/get/delivery/address/by/id', [CheckoutController::class, 'getDeliveryAddressById']);
+
 //Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
-Route::post('checkout', [CheckoutController::class, 'process']);
+Route::post('checkout', [CheckoutController::class, 'processCheckout']);
 Route::get('checkout/initiate/paypal', [CheckoutController::class, 'initiatePaypal']);
 Route::get('checkout/initiate/stripe', [CheckoutController::class, 'initiateStripe']);
 Route::get('checkout/paypal/payment/status', [CheckoutController::class, 'paypalPaymentStatus']);

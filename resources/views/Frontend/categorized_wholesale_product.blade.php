@@ -793,46 +793,14 @@
 
 
 
-        $(document).on('click', '#add_to_cart', function () {
-            let formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('product_id', '{{ $product->id }}');
-            formData.append('quantity', parseInt($('#quantity').text()));
-            $.ajax({
-                method: 'post',
-                url: '{{ url('product/add/to/cart') }}',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (result) {
-                    console.log(result);
-                    $('#cart_counter').text(result.data);
-                    $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
-                    $.toast({
-                        text : result.message,
-                        showHideTransition : 'slide',
-                        bgColor : 'green',
-                        textColor : '#eee',
-                        allowToastClose : true,
-                        hideAfter : 5000,
-                        stack : 5,
-                        textAlign : 'left',
-                        position : 'bottom-left'
-                    });
 
-                },
-                error: function (xhr) {
-                    console.log(xhr)
-                }
-            });
-        });
 
         $(document).on('click', '#place_an_order', function () {
 
 
             $.ajax({
                 method: 'get',
-                url: '{{ url('product/check/account/login/status') }}',
+                url: '{{ url('check/account/login/status') }}',
                 success: function (result) {
                     console.log(result);
                     if (result.account_login_status === true) {
@@ -842,18 +810,17 @@
                         formData.append('quantity', parseInt($('#quantity').text()));
                         $.ajax({
                             method: 'post',
-                            url: '{{ url('product/add/to/cart') }}',
+                            url: '{{ url('product/add/to/session') }}',
                             data: formData,
                             processData: false,
                             contentType: false,
                             success: function (result) {
                                 console.log(result);
-                                $('#cart_counter').text(result.data);
-                                $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
-                                location = '{{ url('checkout') }}';
+
+                                location = '{{ url('place/order') }}';
                             },
                             error: function (xhr) {
-                                console.log(xhr)
+                                console.log(xhr);
                             }
                         });
                     } else {

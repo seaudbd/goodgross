@@ -10,14 +10,16 @@ class PlaceOrderController extends Controller
 {
     public function index()
     {
-        $title = 'Place Order | GoodGross';
-        $sessionItems =  Session::get('session_items');
+        $title = 'Place Order';
+        $wholesaleItem =  Session::get('wholesale_item');
         $activeNav = 'Place Order';
-        if (Session::has('account_login_status')) {
+        if (auth()->check()) {
             $accountLoginStatus = true;
         } else {
             $accountLoginStatus = false;
         }
-        return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'accountLoginStatus'));
+        //dd($wholesaleItem);
+//        dd($wholesaleItem->productProperties->where('property.property', 'Images')->first()->value);
+        return view('Frontend.place_order', compact('title', 'wholesaleItem', 'activeNav', 'accountLoginStatus'));
     }
 }

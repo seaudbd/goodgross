@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CheckoutRequest;
+use App\Http\Requests\Frontend\CheckoutRequest;
 
 
+use App\Http\Requests\Frontend\DeliveryAddressRequest;
 use App\Models\Account;
+use App\Models\AccountShipping;
+use App\Models\Country;
+use App\Models\State;
 use App\Models\UserNotification;
 use App\Models\Guest;
 use App\Models\AccountNotification;
@@ -25,17 +29,15 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
 use Illuminate\Support\Str;
-use PayPal\Api\Amount;
-use PayPal\Api\Details;
-use PayPal\Api\Item;
-use PayPal\Api\ItemList;
-use PayPal\Api\Payer;
-use PayPal\Api\Payment;
-use PayPal\Api\PaymentExecution;
-use PayPal\Api\RedirectUrls;
-use PayPal\Api\Transaction;
-use PayPal\Auth\OAuthTokenCredential;
-use PayPal\Rest\ApiContext;
+
+///////////////////////PayPal////////////////////////////////
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+
+///////////////////////////////////////End of PayPal////////////////////////////
+
+use Stevebauman\Location\Facades\Location;
 
 use \Stripe\StripeClient;
 use \Exception;
@@ -48,40 +50,85 @@ use \Stripe\Exception\ApiErrorException;
 
 class CheckoutController extends Controller
 {
-    private $apiContext;
+    //private $apiContext;
 
-    public function __construct()
+//    public function __construct()
+//    {
+//        $paypalConf = Config::get('paypal');
+//        $this->apiContext = new ApiContext(new OAuthTokenCredential(
+//                $paypalConf['client_id'],
+//                $paypalConf['secret'])
+//        );
+//        $this->apiContext->setConfig($paypalConf['settings']);
+//
+//    }
+
+    public function loadCheckout()
     {
-        $paypalConf = Config::get('paypal');
-        $this->apiContext = new ApiContext(new OAuthTokenCredential(
-                $paypalConf['client_id'],
-                $paypalConf['secret'])
-        );
-        $this->apiContext->setConfig($paypalConf['settings']);
-
-    }
-
-    public function index()
-    {
-        $title = 'Checkout | GoodGross';
+        $title = 'Checkout';
         $checkoutItems =  Session::get('checkout_items');
+//        $selectedShippingInformation = Session::get('selected_shipping_information');
+
+
+
         $activeNav = 'Checkout';
-        if (Session::has('account_login_status')) {
-            $accountLoginStatus = true;
+        if ($position = Location::get(request()->getClientIp())) {
+            $userCountry = $position->countryName;
+            $userState = $position->regionName;
         } else {
-            $accountLoginStatus = false;
+            $userCountry = null;
+            $userState = null;
         }
-        return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'accountLoginStatus'));
+        $countries = Country::where('status', 'Active')->get();
+        $states = State::where('status', 'Active')->get();
+        $userAccount = auth()->user()->account;
+        $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
+
+        return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'userCountry', 'userState', 'userAccount', 'userAccountDetails', 'countries', 'states'));
     }
 
-    public function checkAccountLoginStatus()
+    public function getItems()
     {
-        if (Session::has('account_login_status')) {
-            return response()->json(['account_login_status' => true]);
-        } else {
-            return response()->json(['account_login_status' => false]);
-        }
+        return response()->json(['success' => true, 'message' => 'Checkout Items Fetched Successfully', 'payload' => Session::get('checkout_items')]);
     }
+
+    public function getDeliveryAddresses()
+    {
+        $accountShippings = AccountShipping::where('account_id', auth()->user()->account->id)->orderBy('is_primary', 'desc')->get();
+        return response()->json(['success' => true, 'message' => 'Delivery Addresses Fetched Successfully', 'payload' => $accountShippings]);
+    }
+
+    public function getDeliveryAddress(Request $request)
+    {
+        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_selected', 1)->first()]);
+    }
+    public function selectDeliveryAddress(Request $request)
+    {
+        AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
+        AccountShipping::where('id', $request->id)->update(['is_selected' => 1]);
+        return response()->json(['success' => true, 'message' => 'Delivery Address Selected Successfully', 'payload' => null]);
+    }
+    public function getDeliveryAddressById(Request $request)
+    {
+        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('id', $request->id)->first()]);
+    }
+
+    public function isShippingAddressAvailable()
+    {
+        $accountShippings = auth()->user()->account->accountShippings;
+        return response()->json(['success' => true, 'message' => 'Shipping Address Information', 'payload' => $accountShippings]);
+    }
+
+
+
+//    public function checkAccountLoginStatus()
+//    {
+//        if (Session::has('account_login_status')) {
+//            return response()->json(['account_login_status' => true]);
+//        } else {
+//            return response()->json(['account_login_status' => false]);
+//        }
+//    }
 
     public function addProduct(Request $request)
     {
@@ -92,12 +139,50 @@ class CheckoutController extends Controller
         return response()->json('Product Added Successfully');
     }
 
-    public function process(CheckoutRequest $request)
+    public function finalize(CheckoutRequest $request)
     {
+
+        $clientId = env('PAYPAL_CLIENT_ID');
+        $clientSecret = env('PAYPAL_SECRET');
+
+        $environment = new SandboxEnvironment($clientId, $clientSecret);
+        $client = new PayPalHttpClient($environment);
+
+        $request = new OrdersCreateRequest();
+
+
+        $request->prefer('return=representation');
+        $request->body = [
+            "intent" => "CAPTURE",
+            "purchase_units" => [[
+                "reference_id" => "test_ref_id1",
+                "amount" => [
+                    "value" => "100.00",
+                    "currency_code" => "USD"
+                ]
+            ]],
+            "application_context" => [
+                "cancel_url" => "https://example.com/cancel",
+                "return_url" => "https://example.com/return"
+            ]
+        ];
+
+        try {
+            // Call API with your client and get a response for your call
+            $response = $client->execute($request);
+
+            // If call returns body in response, you can get the deserialized version from the result attribute of the response
+            print_r($response->statusCode);
+        }catch (HttpException $ex) {
+            echo $ex->statusCode;
+            print_r($ex->getMessage());
+        }
+
+
 
         $shippingInformation = $request->all(['first_name_for_shipping', 'last_name_for_shipping', 'address_line_1_for_shipping', 'address_line_2_for_shipping', 'country_for_shipping', 'city_for_shipping', 'region_for_shipping', 'postal_code_for_shipping', 'email_for_shipping', 'phone_for_shipping']);
         Session::put('shipping_information', $shippingInformation);
-        
+
         if ($request->has('different_from_shipping_information')) {
             $billingInformation = $request->all(['first_name_for_billing', 'last_name_for_billing', 'address_line_1_for_billing', 'address_line_2_for_billing', 'country_for_billing', 'city_for_billing', 'region_for_billing', 'postal_code_for_billing', 'email_for_billing', 'phone_for_billing']);
             $billingInformation['is_different_from_shipping'] = true;
@@ -105,7 +190,7 @@ class CheckoutController extends Controller
             $billingInformation['is_different_from_shipping'] = false;
         }
         Session::put('billing_information', $billingInformation);
-        
+
         if ($request->get('payment_method') === 'Card') {
             $cardInformation = $request->all(['card_number', 'card_cvc', 'expiry_month', 'expiry_year']);
             Session::put('card_information', $cardInformation);

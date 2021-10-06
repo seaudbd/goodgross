@@ -440,6 +440,8 @@
         </div>
     </div>
 
+    <div class="mt-3"></div>
+
 
     <div class="modal" tabindex="-1" id="sign_in_modal">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -555,7 +557,7 @@
     </div>
 
 
-    <div class="mt-3"></div>
+
 
     <script type="text/javascript">
 
@@ -603,7 +605,7 @@
             }
         });
 
-        $(document).on('submit', '#sign_in_form', function() {
+        $(document).on('submit', '#sign_in_form', function(event) {
 
             event.preventDefault();
 
@@ -626,13 +628,13 @@
                 processData: false,
                 cache: false,
                 global: false,
-                success: function (result) {
-                    console.log(result);
+                success: function (authenticationResult) {
+                    console.log(authenticationResult);
                     $('#sign_in_form_submit').removeClass('disabled');
                     $('#sign_in_form_submit_text').removeClass('sr-only');
                     $('#sign_in_form_submit_processing').addClass('sr-only');
-                    if (result.success === true) {
-
+                    if (authenticationResult.success === true) {
+                        $('#sign_in_modal .btn-close').click();
 
                         $.ajax({
                             method: 'get',
@@ -656,11 +658,37 @@
                                         processData: false,
                                         contentType: false,
                                         global: false,
-                                        success: function (response) {
-                                            console.log(response);
-                                            $('#cart_counter').text(response.data);
+                                        success: function (cartResult) {
+                                            console.log(cartResult);
+                                            $('#cart_counter').text(cartResult.data);
                                             $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
-                                            location = '{{ url('checkout') }}';
+                                            $.ajax({
+                                                method: 'get',
+                                                url: '{{ url('cart/copy/items/to/checkout') }}',
+                                                success: function (checkoutResult) {
+                                                    console.log(checkoutResult);
+                                                    $.ajax({
+                                                        method: 'get',
+                                                        url: '{{ url('is/shipping/address/available') }}',
+                                                        success: function (shippingAddressResult) {
+                                                            console.log(shippingAddressResult);
+                                                            if (shippingAddressResult.payload.length > 0) {
+                                                                location = '{{ url('checkout') }}';
+                                                            } else {
+                                                                location = '{{ url('delivery/address') }}';
+                                                            }
+
+                                                        },
+                                                        error: function (xhr) {
+                                                            console.log(xhr)
+                                                        }
+                                                    });
+
+                                                },
+                                                error: function (xhr) {
+                                                    console.log(xhr)
+                                                }
+                                            });
 
                                         },
                                         error: function (xhr) {
@@ -711,10 +739,10 @@
                         });
 
                     } else {
-                        if (result.message === 'Pending Account') {
-                            location = '{{ url('email/verification') }}/' + result.account.id;
+                        if (authenticationResult.message === 'Pending Account') {
+                            location = '{{ url('email/verification') }}/' + authenticationResult.account.id;
                         } else {
-                            $('#sign_in_form_message').text(result.message).addClass('mb-3');
+                            $('#sign_in_form_message').text(authenticationResult.message).addClass('mb-3');
                         }
 
                     }
@@ -742,12 +770,7 @@
 
 
 
-        {{--$(document).on('change', '#quantity', function () {--}}
-            {{--let quantity = parseFloat($(this).val());--}}
-            {{--let pricePerUnit = parseFloat('{{ $product->productProperties->where('property', 'Price')->first('value')->value }}');--}}
-            {{--$('#total_price').text(quantity * pricePerUnit);--}}
-            {{--return false;--}}
-        {{--});--}}
+
 
         let hide = false;
         $(document).on('click', '#show_less', function () {
@@ -831,10 +854,11 @@
 
             $.ajax({
                 method: 'get',
-                url: '{{ url('product/check/account/login/status') }}',
-                success: function (result) {
-                    console.log(result);
-                    if (result.account_login_status === true) {
+                url: '{{ url('check/account/login/status') }}',
+                success: function (loginStatusResult) {
+                    console.log(loginStatusResult);
+                    if (loginStatusResult.account_login_status === true) {
+                        console.log('logged in')
                         let formData = new FormData();
                         formData.append('_token', '{{ csrf_token() }}');
                         formData.append('product_id', '{{ $product->id }}');
@@ -845,17 +869,45 @@
                             data: formData,
                             processData: false,
                             contentType: false,
-                            success: function (result) {
-                                console.log(result);
-                                $('#cart_counter').text(result.data);
-                                $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
-                                location = '{{ url('checkout') }}';
+                            success: function (cartResult) {
+                                console.log(cartResult);
+
+
+                                $.ajax({
+                                    method: 'get',
+                                    url: '{{ url('cart/copy/items/to/checkout') }}',
+                                    success: function (checkoutResult) {
+                                        console.log(checkoutResult);
+                                        $.ajax({
+                                            method: 'get',
+                                            url: '{{ url('is/shipping/address/available') }}',
+                                            success: function (shippingAddressResult) {
+                                                console.log(shippingAddressResult);
+                                                if (shippingAddressResult.payload.length > 0) {
+                                                    location = '{{ url('checkout') }}';
+                                                } else {
+                                                    location = '{{ url('delivery/address') }}';
+                                                }
+
+                                            },
+                                            error: function (xhr) {
+                                                console.log(xhr)
+                                            }
+                                        });
+
+                                    },
+                                    error: function (xhr) {
+                                        console.log(xhr)
+                                    }
+                                });
+
                             },
                             error: function (xhr) {
                                 console.log(xhr)
                             }
                         });
                     } else {
+                        console.log('not logged in')
                         whichAction = 'buy_it_now'
                         $('#sign_in_modal').modal('show');
                     }
@@ -867,26 +919,26 @@
 
         });
 
-        $(document).on('click', '.checkout_as_guest', function () {
-            let quantity = $('#quantity').val();
-            let productId = '{{ $product->id }}';
-            $.ajax({
-                method: 'get',
-                url: '{{ url('checkout/add/product') }}',
-                data: {
-                    quantity: quantity,
-                    product_id: productId
-                },
+        {{--$(document).on('click', '.checkout_as_guest', function () {--}}
+        {{--    let quantity = $('#quantity').val();--}}
+        {{--    let productId = '{{ $product->id }}';--}}
+        {{--    $.ajax({--}}
+        {{--        method: 'get',--}}
+        {{--        url: '{{ url('checkout/add/product') }}',--}}
+        {{--        data: {--}}
+        {{--            quantity: quantity,--}}
+        {{--            product_id: productId--}}
+        {{--        },--}}
 
-                success: function (result) {
-                    console.log(result);
-                    location = '{{ url('checkout') }}';
-                },
-                error: function (xhr) {
-                    console.log(xhr)
-                }
-            });
-        });
+        {{--        success: function (result) {--}}
+        {{--            console.log(result);--}}
+        {{--            location = '{{ url('checkout') }}';--}}
+        {{--        },--}}
+        {{--        error: function (xhr) {--}}
+        {{--            console.log(xhr)--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
 
         $(document).on('click', '#add_to_watch', function () {
 
@@ -894,7 +946,7 @@
 
             $.ajax({
                 method: 'get',
-                url: '{{ url('product/check/account/login/status') }}',
+                url: '{{ url('check/account/login/status') }}',
                 success: function (result) {
                     console.log(result);
                     if (result.account_login_status === true) {
@@ -942,6 +994,10 @@
 
 
 
+
+        $(document).on('click', '#view_cart', function (event) {
+            location = '{{ url('cart') }}';
+        });
 
 
 

@@ -16,10 +16,9 @@ class ProductController extends Controller
 {
     private $rootCategories = [];
 
-    public function loadCategorizedProducts($categoryId) {
-
+    public function loadCategorizedProducts($categoryId)
+    {
         $category = Category::where('id', base64_decode(base64_decode(base64_decode(base64_decode(base64_decode($categoryId))))))->with(['categoryType'])->first();
-
         $this->findRootCategories($category->root_id);
         $title = $category->category;
         $activeNav = $category->category;
@@ -31,9 +30,8 @@ class ProductController extends Controller
         }
     }
 
-    public function getCategorizedProducts(Request $request) {
-
-
+    public function getCategorizedProducts(Request $request)
+    {
         $products = Product::where('category_id', $request->category_id)->where('status', 'Approved')
             ->whereHas('productProperties', function ($query) use ($request) {
                 if (count(json_decode($request->filters)) > 0) {
@@ -111,20 +109,20 @@ class ProductController extends Controller
 
     public function addToCart(Request $request) {
 
-        $product = Product::where('id', $request->product_id)->with(['productProperties', 'account.personalAccount', 'account.businessAccount'])->first();
+        $product = Product::where('id', $request->product_id)->with(['productProperties.property', 'account.personalAccount', 'account.businessAccount'])->first();
         $product['quantity'] = $request->quantity;
-//        $pushableItem = true;
-//        if (Session::get('cart_items')) {
-//            foreach (Session::get('cart_items') as $item){
-//                if ($item->id == $product->id){
-//                    $pushableItem = false;
-//                    break;
-//                }
-//            }
-//        }
-//        if ($pushableItem){
+        $pushableItem = true;
+        if (Session::get('cart_items')) {
+            foreach (Session::get('cart_items') as $item){
+                if ($item->id == $product->id){
+                    $pushableItem = false;
+                    break;
+                }
+            }
+        }
+        if ($pushableItem) {
             Session::push('cart_items', $product);
-//        }
+        }
 
         view()->share('cartCounter', count(Session::get('cart_items')));
         return response()->json(['success' => true, 'message' => 'Product added to Cart successfully', 'data' => count(Session::get('cart_items'))]);
@@ -139,34 +137,13 @@ class ProductController extends Controller
     }
 
 
-    public function addToSession(Request $request) {
+    public function addWholesaleItemToSession(Request $request) {
 
-        $product = Product::where('id', $request->product_id)->with(['productProperties', 'account.personalAccount', 'account.businessAccount'])->first();
+        $product = Product::where('id', $request->product_id)->with(['productProperties.property', 'account.businessAccount'])->first();
         $product['quantity'] = $request->quantity;
-//        $pushableItem = true;
-//        if (Session::get('cart_items')) {
-//            foreach (Session::get('cart_items') as $item){
-//                if ($item->id == $product->id){
-//                    $pushableItem = false;
-//                    break;
-//                }
-//            }
-//        }
-//        if ($pushableItem){
-        Session::push('session_items', $product);
-//        }
-
-
-        return response()->json(['success' => true, 'message' => 'Product added to Session successfully', 'payload' => null]);
+        Session::put('wholesale_item', $product);
+        return response()->json(['success' => true, 'message' => 'Wholesale product added to session successfully', 'payload' => null]);
     }
 
-    public function checkAccountLoginStatus()
-    {
 
-        if (auth()->check()) {
-            return response()->json(['account_login_status' => true]);
-        } else {
-            return response()->json(['account_login_status' => false]);
-        }
-    }
 }

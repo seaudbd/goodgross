@@ -181,7 +181,7 @@
             }
         });
 
-        $(document).on('submit', '#sign_in_form', function() {
+        $(document).on('submit', '#sign_in_form', function(event) {
 
 
 

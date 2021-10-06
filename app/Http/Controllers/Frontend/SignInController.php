@@ -149,6 +149,17 @@ class SignInController extends Controller
 
     }
 
+
+    public function checkAccountLoginStatus()
+    {
+
+        if (auth()->check()) {
+            return response()->json(['account_login_status' => true]);
+        } else {
+            return response()->json(['account_login_status' => false]);
+        }
+    }
+
     public function accountSignOut()
     {
         Auth::logout();
