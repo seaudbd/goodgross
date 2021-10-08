@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Frontend\DeliveryAddressRequest;
+use App\Models\AccountBilling;
 use App\Models\AccountShipping;
 use App\Models\Country;
 use App\Models\State;
@@ -36,11 +37,8 @@ class DeliveryAddressController extends Controller
 
     public function saveDeliveryAddress(DeliveryAddressRequest $request)
     {
-
-        //return $request;
-
         $country = Country::where('id', $request->country_id)->first()->country;
-        $accountShipping = $request->has('id') ? AccountShipping::find($request->id) : new AccountShipping();
+        $accountShipping = new AccountShipping();
         $accountShipping->account_id = auth()->user()->account->id;
         $accountShipping->first_name = $request->first_name;
         $accountShipping->last_name = $request->last_name;
@@ -52,50 +50,27 @@ class DeliveryAddressController extends Controller
         $accountShipping->address_line_2 = $request->address_line_2;
         $accountShipping->phone = $request->phone;
         $accountShipping->email = $request->email;
-        if ($request->has('id')) {
-            if ($request->has('is_primary')) {
-                if ($request->is_primary) {
-                    AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
-                    $accountShipping->is_primary = 1;
-                }
-            }
-        } else {
-            if ($request->is_primary === 'true' || (int)$request->is_primary === 1) {
-                AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
-                $accountShipping->is_primary = 1;
-            } else {
-                $accountShipping->is_primary = 0;
-            }
-            if ($request->has('is_selected')) {
-                $accountShipping->is_selected = $request->is_selected;
-            } else {
-                $accountShipping->is_selected = 0;
-            }
-        }
-        //return $accountShipping;
-
-
-
-
+        $accountShipping->is_primary = $request->is_primary;
+        $accountShipping->is_selected = $request->is_selected;
         $accountShipping->save();
-//        $shippingInformation = [
-//            'account_id' => auth()->user()->account->id,
-//            'first_name' => $request->first_name,
-//            'last_name' => $request->last_name,
-//            'country' => $country,
-//            'state' => $request->state,
-//            'city' => $request->city,
-//            'postal_code' => $request->postal_code,
-//            'address_line_1' => $request->address_line_1,
-//            'address_line_2' => $request->address_line_2,
-//            'phone' => $request->phone,
-//            'email' => $request->email,
-//            'is_primary' => 1,
-//            'is_selected' => 1
-//        ];
-//        Session::put('selected_shipping_information', $shippingInformation);
-//        $shippingInformation['account_id'] = auth()->user()->account->id;
-//        AccountShipping::create($shippingInformation);
+
+        $accountBilling = new AccountBilling();
+        $accountBilling->account_id = auth()->user()->account->id;
+        $accountBilling->first_name = $request->first_name;
+        $accountBilling->last_name = $request->last_name;
+        $accountBilling->country = $country;
+        $accountBilling->state = $request->state;
+        $accountBilling->city = $request->city;
+        $accountBilling->postal_code = $request->postal_code;
+        $accountBilling->address_line_1 = $request->address_line_1;
+        $accountBilling->address_line_2 = $request->address_line_2;
+        $accountBilling->phone = $request->phone;
+        $accountBilling->email = $request->email;
+        $accountBilling->is_primary = $request->is_primary;
+        $accountBilling->is_selected = $request->is_selected;
+        $accountBilling->save();
+
+
         return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
     }
 }

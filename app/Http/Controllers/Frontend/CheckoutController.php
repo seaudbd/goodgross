@@ -8,6 +8,7 @@ use App\Http\Requests\Frontend\CheckoutRequest;
 
 use App\Http\Requests\Frontend\DeliveryAddressRequest;
 use App\Models\Account;
+use App\Models\AccountBilling;
 use App\Models\AccountShipping;
 use App\Models\Country;
 use App\Models\State;
@@ -22,6 +23,7 @@ use App\Models\OrderTransaction;
 use App\Models\Product;
 
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
@@ -67,10 +69,6 @@ class CheckoutController extends Controller
     {
         $title = 'Checkout';
         $checkoutItems =  Session::get('checkout_items');
-//        $selectedShippingInformation = Session::get('selected_shipping_information');
-
-
-
         $activeNav = 'Checkout';
         if ($position = Location::get(request()->getClientIp())) {
             $userCountry = $position->countryName;
@@ -83,7 +81,6 @@ class CheckoutController extends Controller
         $states = State::where('status', 'Active')->get();
         $userAccount = auth()->user()->account;
         $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
-
         return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'userCountry', 'userState', 'userAccount', 'userAccountDetails', 'countries', 'states'));
     }
 
@@ -98,7 +95,7 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Delivery Addresses Fetched Successfully', 'payload' => $accountShippings]);
     }
 
-    public function getDeliveryAddress(Request $request)
+    public function getDeliveryAddress()
     {
         return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_selected', 1)->first()]);
     }
@@ -113,22 +110,83 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('id', $request->id)->first()]);
     }
 
+    public function saveDeliveryAddress(DeliveryAddressRequest $request)
+    {
+        $country = Country::where('id', $request->country_id)->first()->country;
+        $accountShipping = $request->has('id') ? AccountShipping::find($request->id) : new AccountShipping();
+        $accountShipping->account_id = auth()->user()->account->id;
+        $accountShipping->first_name = $request->first_name;
+        $accountShipping->last_name = $request->last_name;
+        $accountShipping->country = $country;
+        $accountShipping->state = $request->state;
+        $accountShipping->city = $request->city;
+        $accountShipping->postal_code = $request->postal_code;
+        $accountShipping->address_line_1 = $request->address_line_1;
+        $accountShipping->address_line_2 = $request->address_line_2;
+        $accountShipping->phone = $request->phone;
+        $accountShipping->email = $request->email;
+        if ($request->has('id')) {
+            if ($request->has('is_primary')) {
+                if ($request->is_primary) {
+                    AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
+                    $accountShipping->is_primary = 1;
+                }
+            }
+        } else {
+            if ($request->is_primary === 'true' || (int)$request->is_primary === 1) {
+                AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
+                $accountShipping->is_primary = 1;
+            } else {
+                $accountShipping->is_primary = 0;
+            }
+            if ($request->has('is_selected')) {
+                $accountShipping->is_selected = $request->is_selected;
+            } else {
+                $accountShipping->is_selected = 0;
+            }
+        }
+
+        $accountShipping->save();
+        return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
+    }
+
+
+    public function getBillingAddress()
+    {
+        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountBilling::where('account_id', auth()->user()->account->id)->first()]);
+    }
+
+    public function getBillingAddressById(Request $request)
+    {
+        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountBilling::where('id', $request->id)->first()]);
+    }
+
+
+    public function saveBillingAddress(DeliveryAddressRequest $request)
+    {
+        $country = Country::where('id', $request->country_id)->first()->country;
+        $accountBilling = AccountBilling::find($request->id);
+        $accountBilling->account_id = auth()->user()->account->id;
+        $accountBilling->first_name = $request->first_name;
+        $accountBilling->last_name = $request->last_name;
+        $accountBilling->country = $country;
+        $accountBilling->state = $request->state;
+        $accountBilling->city = $request->city;
+        $accountBilling->postal_code = $request->postal_code;
+        $accountBilling->address_line_1 = $request->address_line_1;
+        $accountBilling->address_line_2 = $request->address_line_2;
+        $accountBilling->phone = $request->phone;
+        $accountBilling->email = $request->email;
+        $accountBilling->save();
+        return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
+    }
+
     public function isShippingAddressAvailable()
     {
         $accountShippings = auth()->user()->account->accountShippings;
         return response()->json(['success' => true, 'message' => 'Shipping Address Information', 'payload' => $accountShippings]);
     }
 
-
-
-//    public function checkAccountLoginStatus()
-//    {
-//        if (Session::has('account_login_status')) {
-//            return response()->json(['account_login_status' => true]);
-//        } else {
-//            return response()->json(['account_login_status' => false]);
-//        }
-//    }
 
     public function addProduct(Request $request)
     {

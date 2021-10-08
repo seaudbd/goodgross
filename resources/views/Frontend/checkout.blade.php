@@ -135,113 +135,218 @@
 
                         <div class="text-secondary fw-bold p-2 mt-4 mb-4" style="background-color: #efefef;">Billing To</div>
 
-                        <div class="form-check mb-4">
-                            <input type="checkbox" class="form-check-input" id="bill_to_same_as_shipping_address" checked>
-                            <label class="form-check-label" for="bill_to_same_as_shipping_address">Bill To same as Shipping Address</label>
+{{--                        <div class="form-check mb-4">--}}
+{{--                            <input type="checkbox" class="form-check-input" id="bill_to_same_as_shipping_address" checked>--}}
+{{--                            <label class="form-check-label" for="bill_to_same_as_shipping_address">Bill To same as Shipping Address</label>--}}
+{{--                        </div>--}}
+
+{{--                        <div id="billing_to_container">--}}
+
+
+{{--                            <div class="row mb-4">--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
+{{--                                        <input type="text" class="form-control" id="first_name_for_billing" name="first_name" placeholder="First Name">--}}
+{{--                                        <label for="first_name_for_billing">First Name</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating">--}}
+{{--                                        <input type="text" class="form-control" id="last_name_for_billing" name="last_name" placeholder="Last Name">--}}
+{{--                                        <label for="last_name_for_billing">Last Name</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+
+{{--                            <div class="row mb-4">--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
+{{--                                        <textarea class="form-control" id="address_line_1_for_billing" name="address_line_1" placeholder="Address Line 1"></textarea>--}}
+{{--                                        <label for="address_line_1_for_billing">Address Line 1</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating">--}}
+{{--                                        <textarea class="form-control" id="address_line_2_for_billing" name="address_line_2" placeholder="Address Line 2"></textarea>--}}
+{{--                                        <label for="address_line_2_for_billing">Address Line 2</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            <div class="row mb-4">--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
+{{--                                        <select class="form-select" name="country_id" id="country_id_for_billing">--}}
+{{--                                            <option value="">Select Country</option>--}}
+{{--                                            @foreach($countries as $country)--}}
+{{--                                                @if($country->country === $userCountry)--}}
+{{--                                                    <option value="{{ $country->id }}" selected>{{ $country->country }}</option>--}}
+{{--                                                @else--}}
+{{--                                                    <option value="{{ $country->id }}">{{ $country->country }}</option>--}}
+{{--                                                @endif--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+{{--                                        <label for="country_id_for_billing">Country</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating">--}}
+{{--                                        @if($userCountry === 'United States')--}}
+{{--                                            <select class="form-select" name="state" id="state_for_billing">--}}
+{{--                                                <option value="">Select State</option>--}}
+{{--                                                @foreach($states as $state)--}}
+{{--                                                    @if($state->state === $userState)--}}
+{{--                                                        <option value="{{ $state->state }}" selected>{{ $state->state }}</option>--}}
+{{--                                                    @else--}}
+{{--                                                        <option value="{{ $state->state }}">{{ $state->state }}</option>--}}
+{{--                                                    @endif--}}
+{{--                                                @endforeach--}}
+
+{{--                                            </select>--}}
+{{--                                        @else--}}
+{{--                                            <input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State">--}}
+{{--                                        @endif--}}
+{{--                                        <label for="state_for_billing">State</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            <div class="row mb-4">--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
+{{--                                        <input type="text" class="form-control" name="city" id="city_for_billing" placeholder="City">--}}
+{{--                                        <label for="city_for_billing">City</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating">--}}
+{{--                                        <input type="text" class="form-control" name="postal_code" id="postal_code_for_billing" placeholder="Postal Code">--}}
+{{--                                        <label for="postal_code_for_billing">Postal Code</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            <div class="row mb-4">--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
+{{--                                        <input type="text" class="form-control" name="phone" id="phone_for_billing" placeholder="Phone">--}}
+{{--                                        <label for="phone_for_billing">Phone</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-12 col-sm-6">--}}
+{{--                                    <div class="form-floating">--}}
+{{--                                        <input type="text" class="form-control" name="email" id="email_for_billing" placeholder="Email">--}}
+{{--                                        <label for="email_for_billing">Email</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+
+
+{{--                        </div>--}}
+
+
+
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body small">
+                                <div id="billing_address_container"></div>
+                                <div id="billing_address_form_container">
+                                    <form id="billing_address_form">
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating mb-4 mb-sm-0">
+                                                    <input type="text" class="form-control" name="first_name" id="first_name_for_billing" placeholder="First Name">
+                                                    <label for="first_name_for_billing">First Name</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="last_name" id="last_name_for_billing" placeholder="Last Name">
+                                                    <label for="last_name_for_billing">Last Name</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating mb-4 mb-sm-0">
+                                                    <select class="form-select" name="country_id" id="country_id_for_billing">
+                                                        <option value="">Select Country</option>
+                                                        @foreach($countries as $country)
+                                                            <option value="{{ $country->id }}">{{ $country->country }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="country_id_for_billing">Country</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <div id="state_field_holder_for_billing">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating mb-4 mb-sm-0">
+                                                    <input type="text" class="form-control" name="city" id="city_for_billing" placeholder="City">
+                                                    <label for="city_for_billing">City</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="postal_code" id="postal_code_for_billing" placeholder="Postal Code">
+                                                    <label for="postal_code_for_billing">Postal Code</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating mb-4 mb-sm-0">
+                                                    <textarea class="form-control" id="address_line_1_for_billing" name="address_line_1" placeholder="Address Line 1"></textarea>
+                                                    <label for="address_line_1_for_billing">Address Line 1</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating">
+                                                    <textarea class="form-control" id="address_line_2_for_billing" name="address_line_2" placeholder="Address Line 2"></textarea>
+                                                    <label for="address_line_2_for_billing">Address Line 2</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating mb-4 mb-sm-0">
+                                                    <input type="text" class="form-control" name="phone" id="phone_for_billing" placeholder="Phone">
+                                                    <label for="phone_for_billing">Phone</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" name="email" id="email_for_billing" placeholder="Email">
+                                                    <label for="email_for_billing">Email</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="row">
+                                            <div class="col d-grid">
+                                                <button type="submit" class="btn primary_btn_default" id="billing_address_form_submit_button">
+                                                    <span id="billing_address_form_submit_button_text">Save</span>
+                                                    <span id="billing_address_form_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
+                                                </button>
+                                            </div>
+                                            <div class="col d-grid">
+                                                <button type="button" class="btn btn-danger" id="billing_address_form_cancel_button">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+
                         </div>
-
-                        <div id="billing_to_container">
-
-
-                            <div class="row mb-4">
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating mb-4 mb-sm-0">
-                                        <input type="text" class="form-control" id="first_name_for_billing" name="first_name" placeholder="First Name">
-                                        <label for="first_name_for_billing">First Name</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" id="last_name_for_billing" name="last_name" placeholder="Last Name">
-                                        <label for="last_name_for_billing">Last Name</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-4">
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating mb-4 mb-sm-0">
-                                        <textarea class="form-control" id="address_line_1_for_billing" name="address_line_1" placeholder="Address Line 1"></textarea>
-                                        <label for="address_line_1_for_billing">Address Line 1</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating">
-                                        <textarea class="form-control" id="address_line_2_for_billing" name="address_line_2" placeholder="Address Line 2"></textarea>
-                                        <label for="address_line_2_for_billing">Address Line 2</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating mb-4 mb-sm-0">
-                                        <select class="form-select" name="country_id" id="country_id_for_billing">
-                                            <option value="">Select Country</option>
-                                            @foreach($countries as $country)
-                                                @if($country->country === $userCountry)
-                                                    <option value="{{ $country->id }}" selected>{{ $country->country }}</option>
-                                                @else
-                                                    <option value="{{ $country->id }}">{{ $country->country }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <label for="country_id_for_billing">Country</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating">
-                                        @if($userCountry === 'United States')
-                                            <select class="form-select" name="state" id="state_for_billing">
-                                                <option value="">Select State</option>
-                                                @foreach($states as $state)
-                                                    @if($state->state === $userState)
-                                                        <option value="{{ $state->state }}" selected>{{ $state->state }}</option>
-                                                    @else
-                                                        <option value="{{ $state->state }}">{{ $state->state }}</option>
-                                                    @endif
-                                                @endforeach
-
-                                            </select>
-                                        @else
-                                            <input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State">
-                                        @endif
-                                        <label for="state_for_billing">State</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating mb-4 mb-sm-0">
-                                        <input type="text" class="form-control" name="city" id="city_for_billing" placeholder="City">
-                                        <label for="city_for_billing">City</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="postal_code" id="postal_code_for_billing" placeholder="Postal Code">
-                                        <label for="postal_code_for_billing">Postal Code</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating mb-4 mb-sm-0">
-                                        <input type="text" class="form-control" name="phone" id="phone_for_billing" placeholder="Phone">
-                                        <label for="phone_for_billing">Phone</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" name="email" id="email_for_billing" placeholder="Email">
-                                        <label for="email_for_billing">Email</label>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-
-
 
 
 
@@ -390,6 +495,32 @@
     <script type="text/javascript">
 
 
+        $(document).on('change', '#country_id', function () {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $(this).val()
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+
+                    $('#state_field_holder').empty();
+                    if (result.length > 0) {
+                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
+                        $.each(result, function (key, state) {
+                            $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
+                        });
+                    } else {
+                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State"><label for="state">State</label></div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
 
 
 
@@ -725,32 +856,7 @@
         });
 
 
-        $(document).on('change', '#country_id', function () {
-            $.ajax({
-                method: 'get',
-                url: '{{ url('get/states/by/country/id') }}',
-                data: {
-                    country_id: $(this).val()
-                },
-                cache: false,
-                success: function (result) {
-                    console.log(result);
 
-                    $('#state_field_holder').empty();
-                    if (result.length > 0) {
-                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
-                        $.each(result, function (key, state) {
-                            $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
-                        });
-                    } else {
-                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State"><label for="state">State</label></div>');
-                    }
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
-        });
 
 
         $(document).on('submit', '#delivery_address_form', function (event) {
@@ -765,7 +871,7 @@
             }
             $.ajax({
                 method: 'post',
-                url: '{{ url('delivery/address/save') }}',
+                url: '{{ url('checkout/save/delivery/address') }}',
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -817,27 +923,203 @@
             loadDeliveryAddress();
         });
 
+
+
+        function loadBillingAddress() {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/billing/address') }}',
+                success: function (result) {
+                    console.log(result);
+                    $('#billing_address_container').empty();
+                    $('#billing_address_container').append(`
+                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
+                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
+                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
+                        <div>` + result.payload.state + `</div>
+                        <div>` + result.payload.country + `</div>
+                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address" data-id="` + result.payload.id + `">Edit</a> | <a href="javascript:void(0)" id="change_billing_address">Change</a></div>
+                    `);
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        }
+
+        $(document).on('click', '#edit_billing_address', function () {
+
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/billing/address/by/id') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                success: function (result) {
+                    console.log(result);
+                    $('#billing_address_container').empty();
+                    $('#billing_address_form_container').find('form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
+                    $('#first_name_for_billing').val(result.payload.first_name);
+                    $('#last_name_for_billing').val(result.payload.last_name);
+                    $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
+
+                    $.ajax({
+                        method: 'get',
+                        url: '{{ url('get/states/by/country/id') }}',
+                        data: {
+                            country_id: $('#country_id_for_billing').val()
+                        },
+                        cache: false,
+                        success: function (states) {
+                            console.log(states);
+                            $('#state_field_holder_for_billing').empty();
+                            if (states.length > 0) {
+                                $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
+                                $.each(states, function (key, state) {
+                                    if (result.payload.state === state.state) {
+                                        $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                                    } else {
+                                        $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
+                                    }
+                                });
+                            } else {
+                                $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + result.payload.state + '"><label for="state_for_billing">State</label></div>');
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr);
+                        }
+                    });
+                    $('#city_for_billing').val(result.payload.city);
+                    $('#postal_code_for_billing').val(result.payload.postal_code);
+                    $('#address_line_1_for_billing').val(result.payload.address_line_1);
+                    $('#address_line_2_for_billing').val(result.payload.address_line_2);
+                    $('#phone_for_billing').val(result.payload.phone);
+                    $('#email_for_billing').val(result.payload.email);
+                    $('#billing_address_form_container').show(1000);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+        });
+
+
+        $(document).on('click', '#change_billing_address', function () {
+            $('#billing_address_container').empty();
+            $('#billing_address_form_container').find('form').append('<input type="hidden" name="id" id="id" value="' + $(this).data('id') + '">');
+            $('#billing_address_form')[0].reset();
+            let userCountry = '{{ $userCountry }}';
+            let userState = '{{ $userState }}';
+            if (userCountry) {
+                $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);
+            }
+            $.ajax({
+                method: 'get',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $('#country_id_for_billing').val()
+                },
+                cache: false,
+                success: function (states) {
+                    console.log(states);
+                    $('#state_field_holder_for_billing').empty();
+                    if (states.length > 0) {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
+                        $.each(states, function (key, state) {
+                            if (userState === state.state) {
+                                $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                            } else {
+                                $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
+                            }
+                        });
+                    } else {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+            $('#billing_address_form_container').show(1000);
+        });
+
+
+
+
+
+
+        $(document).on('submit', '#billing_address_form', function (event) {
+            event.preventDefault();
+            $('#billing_address_form_submit_button').addClass('disabled');
+            $('#billing_address_form_submit_button_text').addClass('sr-only');
+            $('#billing_address_form_submit_button_processing').removeClass('sr-only');
+            let formData = new FormData(this);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                method: 'post',
+                url: '{{ url('checkout/save/billing/address') }}',
+                data: formData,
+                contentType: false,
+                processData: false,
+                cache: false,
+                global: false,
+                success: function (result) {
+                    console.log(result);
+                    $('#billing_address_form_submit_button').removeClass('disabled');
+                    $('#billing_address_form_submit_button_text').removeClass('sr-only');
+                    $('#billing_address_form_submit_button_processing').addClass('sr-only');
+                    $('#billing_address_form_container').find('#id').remove();
+                    $('#billing_address_form_container').hide(1000);
+                    loadBillingAddress();
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                    $('#billing_address_form_submit_button').removeClass('disabled');
+                    $('#billing_address_form_submit_button_text').removeClass('sr-only');
+                    $('#billing_address_form_submit_button_processing').addClass('sr-only');
+                    if (xhr.responseJSON.hasOwnProperty('errors')) {
+
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            $('#' + key).after('<div class="invalid-feedback"></div>');
+                            $('#' + key).addClass('is-invalid');
+                            $.each(value, function (k, v) {
+                                $('#' + key).parent().find('.invalid-feedback').append('<div>' + v + '</div>');
+                            });
+                        })
+                    }
+                }
+            });
+
+        });
+
+        $(document).on('click', '#billing_address_form_cancel_button', function () {
+            $('#billing_address_form_container').find('#id').remove();
+            $('#billing_address_form_container').hide(1000);
+            loadBillingAddress();
+        });
+
+
+
         $(document).ready(function () {
 
             loadCheckoutItems();
             loadDeliveryAddress();
+            loadBillingAddress();
 
             $('#delivery_address_form_container').find('#id').remove();
             $('#save_as_primary_address').parent().remove();
             $('#delivery_address_form_container').hide();
 
-            $('#billing_to_container').hide();
-            $('#first_name_for_shipping').attr('disabled', true);
-            $('#last_name_for_shipping').attr('disabled', true);
-            $('#address_line_1_for_shipping').attr('disabled', true);
-            $('#address_line_2_for_shipping').attr('disabled', true);
-            $('#country_id_for_shipping').attr('disabled', true);
-            $('#city_for_shipping').attr('disabled', true);
-            $('#state_for_shipping').attr('disabled', true);
-            $('#postal_code_for_shipping').attr('disabled', true);
-            $('#email_for_shipping').attr('disabled', true);
-            $('#phone_for_shipping').attr('disabled', true);
-
+            $('#billing_address_form_container').find('#id').remove();
+            $('#billing_address_form_container').hide();
 
             $('#payment_method_card_details').hide();
             $('#card_number').attr('disabled', true);
@@ -848,37 +1130,6 @@
 
         })
 
-
-
-
-        $(document).on('click', '#bill_to_same_as_shipping_address', function () {
-            if ($(this).is(':checked') === false) {
-                $('#first_name_for_shipping').removeAttr('disabled');
-                $('#last_name_for_shipping').removeAttr('disabled');
-                $('#address_line_1_for_shipping').removeAttr('disabled');
-                $('#address_line_2_for_shipping').removeAttr('disabled');
-                $('#country_id_for_shipping').removeAttr('disabled');
-                $('#city_for_shipping').removeAttr('disabled');
-                $('#region_for_shipping').removeAttr('disabled');
-                $('#postal_code_for_shipping').removeAttr('disabled');
-                $('#email_for_shipping').removeAttr('disabled');
-                $('#phone_for_shipping').removeAttr('disabled');
-                $('#billing_to_container').show(1000);
-            } else {
-                $('#first_name_for_shipping').attr('disabled', true);
-                $('#last_name_for_shipping').attr('disabled', true);
-                $('#address_line_1_for_shipping').attr('disabled', true);
-                $('#address_line_2_for_shipping').attr('disabled', true);
-                $('#country_id_for_shipping').attr('disabled', true);
-                $('#city_for_shipping').attr('disabled', true);
-                $('#region_for_shipping').attr('disabled', true);
-                $('#postal_code_for_shipping').attr('disabled', true);
-                $('#email_for_shipping').attr('disabled', true);
-                $('#phone_for_shipping').attr('disabled', true);
-                $('#billing_to_container').hide(1000);
-            }
-            return true;
-        });
 
         $(document).on('click', '.payment_method', function () {
             $('#card_number').val('').attr('disabled', true);

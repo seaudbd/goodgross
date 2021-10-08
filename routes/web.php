@@ -98,6 +98,11 @@ Route::get('checkout/get/delivery/addresses', [CheckoutController::class, 'getDe
 Route::get('checkout/get/delivery/address', [CheckoutController::class, 'getDeliveryAddress']);
 Route::get('checkout/select/delivery/address', [CheckoutController::class, 'selectDeliveryAddress']);
 Route::get('checkout/get/delivery/address/by/id', [CheckoutController::class, 'getDeliveryAddressById']);
+Route::post('checkout/save/delivery/address', [CheckoutController::class, 'saveDeliveryAddress']);
+
+Route::get('checkout/get/billing/address', [CheckoutController::class, 'getBillingAddress']);
+Route::get('checkout/get/billing/address/by/id', [CheckoutController::class, 'getBillingAddressById']);
+Route::post('checkout/save/billing/address', [CheckoutController::class, 'saveBillingAddress']);
 
 //Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
 Route::post('checkout', [CheckoutController::class, 'processCheckout']);
