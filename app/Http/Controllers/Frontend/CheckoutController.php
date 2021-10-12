@@ -79,9 +79,16 @@ class CheckoutController extends Controller
         }
         $countries = Country::where('status', 'Active')->get();
         $states = State::where('status', 'Active')->get();
-        $userAccount = auth()->user()->account;
-        $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
-        return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'userCountry', 'userState', 'userAccount', 'userAccountDetails', 'countries', 'states'));
+        $isGuest = false;
+        if (auth()->check()) {
+            $userAccount = auth()->user()->account;
+            $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
+            return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'userCountry', 'userState', 'userAccount', 'userAccountDetails', 'countries', 'states', 'isGuest'));
+        } else {
+            $isGuest = true;
+            return view('Frontend.checkout', compact('title', 'checkoutItems', 'activeNav', 'userCountry', 'userState', 'countries', 'states', 'isGuest'));
+        }
+
     }
 
     public function getItems()
@@ -95,15 +102,26 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Delivery Addresses Fetched Successfully', 'payload' => $accountShippings]);
     }
 
-    public function getDeliveryAddress()
+    public function getAccountDeliveryAddress()
     {
-        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_selected', 1)->first()]);
+        return response()->json(['success' => true, 'message' => 'Account Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_primary', 1)->first()]);
+    }
+
+    public function getGuestDeliveryAddress()
+    {
+        return response()->json(['success' => true, 'message' => 'Guest Delivery Address Fetched Successfully', 'payload' => Session::get('delivery_address_for_guest')]);
     }
     public function selectDeliveryAddress(Request $request)
     {
         AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
         AccountShipping::where('id', $request->id)->update(['is_selected' => 1]);
         return response()->json(['success' => true, 'message' => 'Delivery Address Selected Successfully', 'payload' => null]);
+    }
+
+    public function deleteDeliveryAddress(Request $request)
+    {
+        AccountShipping::where('id', $request->id)->delete();
+        return response()->json(['success' => true, 'message' => 'Delivery Address Deleted Successfully', 'payload' => null]);
     }
     public function getDeliveryAddressById(Request $request)
     {
@@ -151,18 +169,23 @@ class CheckoutController extends Controller
     }
 
 
-    public function getBillingAddress()
+    public function getAccountBillingAddress()
     {
-        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountBilling::where('account_id', auth()->user()->account->id)->first()]);
+        return response()->json(['success' => true, 'message' => 'Account Billing Address Fetched Successfully', 'payload' => AccountBilling::where('account_id', auth()->user()->account->id)->first()]);
     }
 
-    public function getBillingAddressById(Request $request)
+    public function getGuestBillingAddress()
     {
-        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountBilling::where('id', $request->id)->first()]);
+        return response()->json(['success' => true, 'message' => 'Guest Billing Address Fetched Successfully', 'payload' => Session::get('billing_address_for_guest')]);
+    }
+
+    public function getAccountBillingAddressById(Request $request)
+    {
+        return response()->json(['success' => true, 'message' => 'Billing Address Fetched Successfully', 'payload' => AccountBilling::where('id', $request->id)->first()]);
     }
 
 
-    public function saveBillingAddress(DeliveryAddressRequest $request)
+    public function saveBillingAddressForAccount(DeliveryAddressRequest $request)
     {
         $country = Country::where('id', $request->country_id)->first()->country;
         $accountBilling = AccountBilling::find($request->id);
@@ -178,6 +201,16 @@ class CheckoutController extends Controller
         $accountBilling->phone = $request->phone;
         $accountBilling->email = $request->email;
         $accountBilling->save();
+        return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
+    }
+
+    public function saveBillingAddressForGuest(DeliveryAddressRequest $request)
+    {
+        $country = Country::where('id', $request->country_id)->first()->country;
+        $billingAddress = $request->except(['_token', 'country_id']);
+        $billingAddress['country'] = $country;
+        Session::forget('billing_address_for_guest');
+        Session::put('billing_address_for_guest', $billingAddress);
         return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
     }
 

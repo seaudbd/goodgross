@@ -547,7 +547,7 @@
                     </div>
 
                     <div style="width: 100%; text-align: center; border-bottom: 1px solid #e8f3ed; line-height: 0.1em; margin: 10px 0 20px;"><span style="background:#fff; padding:0 10px;">Or</span></div>
-                    <div class="text-center my-4"><button type="button" class="btn primary_btn_default">Continue as Guest</button></div>
+                    <div class="text-center my-4"><button type="button" id="continue_as_guest" class="btn primary_btn_default">Continue as Guest</button></div>
 
 
 
@@ -858,7 +858,7 @@
                 success: function (loginStatusResult) {
                     console.log(loginStatusResult);
                     if (loginStatusResult.account_login_status === true) {
-                        console.log('logged in')
+
                         let formData = new FormData();
                         formData.append('_token', '{{ csrf_token() }}');
                         formData.append('product_id', '{{ $product->id }}');
@@ -907,7 +907,7 @@
                             }
                         });
                     } else {
-                        console.log('not logged in')
+
                         whichAction = 'buy_it_now'
                         $('#sign_in_modal').modal('show');
                     }
@@ -919,26 +919,41 @@
 
         });
 
-        {{--$(document).on('click', '.checkout_as_guest', function () {--}}
-        {{--    let quantity = $('#quantity').val();--}}
-        {{--    let productId = '{{ $product->id }}';--}}
-        {{--    $.ajax({--}}
-        {{--        method: 'get',--}}
-        {{--        url: '{{ url('checkout/add/product') }}',--}}
-        {{--        data: {--}}
-        {{--            quantity: quantity,--}}
-        {{--            product_id: productId--}}
-        {{--        },--}}
+        $(document).on('click', '#continue_as_guest', function () {
+            $('#sign_in_modal .btn-close').click();
+            let formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('product_id', '{{ $product->id }}');
+            formData.append('quantity', parseInt($('#quantity').text()));
+            $.ajax({
+                method: 'post',
+                url: '{{ url('product/add/to/cart') }}',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (cartResult) {
+                    console.log(cartResult);
 
-        {{--        success: function (result) {--}}
-        {{--            console.log(result);--}}
-        {{--            location = '{{ url('checkout') }}';--}}
-        {{--        },--}}
-        {{--        error: function (xhr) {--}}
-        {{--            console.log(xhr)--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--});--}}
+
+                    $.ajax({
+                        method: 'get',
+                        url: '{{ url('cart/copy/items/to/checkout') }}',
+                        success: function (checkoutResult) {
+                            console.log(checkoutResult);
+                            location = '{{ url('delivery/address') }}';
+
+                        },
+                        error: function (xhr) {
+                            console.log(xhr)
+                        }
+                    });
+
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        });
 
         $(document).on('click', '#add_to_watch', function () {
 

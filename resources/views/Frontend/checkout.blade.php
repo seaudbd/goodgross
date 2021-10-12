@@ -7,6 +7,22 @@
         .page_identity_line a {
             color: #999999;
         }
+
+        .mod_button_1 {
+            border: none;
+            background-color: skyblue;
+            border-radius: 5px;
+            color: #00115D;
+            font-family: monospace;
+        }
+
+        .mod_button_2 {
+            border: none;
+            background-color: #ff0000fc;
+            border-radius: 5px;
+            color: azure;
+            font-family: monospace;
+        }
     </style>
     <div class="container-fluid">
         <div class="row">
@@ -114,13 +130,13 @@
 
                                         <div class="row">
                                             <div class="col d-grid">
-                                                <button type="submit" class="btn primary_btn_default" id="delivery_address_form_submit_button">
+                                                <button type="submit" class="mod_button_1" id="delivery_address_form_submit_button">
                                                     <span id="delivery_address_form_submit_button_text">Save</span>
                                                     <span id="delivery_address_form_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
                                                 </button>
                                             </div>
                                             <div class="col d-grid">
-                                                <button type="button" class="btn btn-danger" id="delivery_address_form_cancel_button">Cancel</button>
+                                                <button type="button" class="mod_button_2" id="delivery_address_form_cancel_button">Cancel</button>
                                             </div>
                                         </div>
                                     </form>
@@ -134,114 +150,6 @@
 
 
                         <div class="text-secondary fw-bold p-2 mt-4 mb-4" style="background-color: #efefef;">Billing To</div>
-
-{{--                        <div class="form-check mb-4">--}}
-{{--                            <input type="checkbox" class="form-check-input" id="bill_to_same_as_shipping_address" checked>--}}
-{{--                            <label class="form-check-label" for="bill_to_same_as_shipping_address">Bill To same as Shipping Address</label>--}}
-{{--                        </div>--}}
-
-{{--                        <div id="billing_to_container">--}}
-
-
-{{--                            <div class="row mb-4">--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
-{{--                                        <input type="text" class="form-control" id="first_name_for_billing" name="first_name" placeholder="First Name">--}}
-{{--                                        <label for="first_name_for_billing">First Name</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating">--}}
-{{--                                        <input type="text" class="form-control" id="last_name_for_billing" name="last_name" placeholder="Last Name">--}}
-{{--                                        <label for="last_name_for_billing">Last Name</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-
-{{--                            <div class="row mb-4">--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
-{{--                                        <textarea class="form-control" id="address_line_1_for_billing" name="address_line_1" placeholder="Address Line 1"></textarea>--}}
-{{--                                        <label for="address_line_1_for_billing">Address Line 1</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating">--}}
-{{--                                        <textarea class="form-control" id="address_line_2_for_billing" name="address_line_2" placeholder="Address Line 2"></textarea>--}}
-{{--                                        <label for="address_line_2_for_billing">Address Line 2</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                            <div class="row mb-4">--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
-{{--                                        <select class="form-select" name="country_id" id="country_id_for_billing">--}}
-{{--                                            <option value="">Select Country</option>--}}
-{{--                                            @foreach($countries as $country)--}}
-{{--                                                @if($country->country === $userCountry)--}}
-{{--                                                    <option value="{{ $country->id }}" selected>{{ $country->country }}</option>--}}
-{{--                                                @else--}}
-{{--                                                    <option value="{{ $country->id }}">{{ $country->country }}</option>--}}
-{{--                                                @endif--}}
-{{--                                            @endforeach--}}
-{{--                                        </select>--}}
-{{--                                        <label for="country_id_for_billing">Country</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating">--}}
-{{--                                        @if($userCountry === 'United States')--}}
-{{--                                            <select class="form-select" name="state" id="state_for_billing">--}}
-{{--                                                <option value="">Select State</option>--}}
-{{--                                                @foreach($states as $state)--}}
-{{--                                                    @if($state->state === $userState)--}}
-{{--                                                        <option value="{{ $state->state }}" selected>{{ $state->state }}</option>--}}
-{{--                                                    @else--}}
-{{--                                                        <option value="{{ $state->state }}">{{ $state->state }}</option>--}}
-{{--                                                    @endif--}}
-{{--                                                @endforeach--}}
-
-{{--                                            </select>--}}
-{{--                                        @else--}}
-{{--                                            <input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State">--}}
-{{--                                        @endif--}}
-{{--                                        <label for="state_for_billing">State</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                            <div class="row mb-4">--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
-{{--                                        <input type="text" class="form-control" name="city" id="city_for_billing" placeholder="City">--}}
-{{--                                        <label for="city_for_billing">City</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating">--}}
-{{--                                        <input type="text" class="form-control" name="postal_code" id="postal_code_for_billing" placeholder="Postal Code">--}}
-{{--                                        <label for="postal_code_for_billing">Postal Code</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                            <div class="row mb-4">--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating mb-4 mb-sm-0">--}}
-{{--                                        <input type="text" class="form-control" name="phone" id="phone_for_billing" placeholder="Phone">--}}
-{{--                                        <label for="phone_for_billing">Phone</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-12 col-sm-6">--}}
-{{--                                    <div class="form-floating">--}}
-{{--                                        <input type="text" class="form-control" name="email" id="email_for_billing" placeholder="Email">--}}
-{{--                                        <label for="email_for_billing">Email</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-
-
-{{--                        </div>--}}
-
-
 
 
                         <div class="card border-0 shadow-sm">
@@ -332,13 +240,13 @@
 
                                         <div class="row">
                                             <div class="col d-grid">
-                                                <button type="submit" class="btn primary_btn_default" id="billing_address_form_submit_button">
+                                                <button type="submit" class="mod_button_1" id="billing_address_form_submit_button">
                                                     <span id="billing_address_form_submit_button_text">Save</span>
                                                     <span id="billing_address_form_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
                                                 </button>
                                             </div>
                                             <div class="col d-grid">
-                                                <button type="button" class="btn btn-danger" id="billing_address_form_cancel_button">Cancel</button>
+                                                <button type="button" class="mod_button_2" id="billing_address_form_cancel_button">Cancel</button>
                                             </div>
                                         </div>
                                     </form>
@@ -495,36 +403,6 @@
     <script type="text/javascript">
 
 
-        $(document).on('change', '#country_id', function () {
-            $.ajax({
-                method: 'get',
-                url: '{{ url('get/states/by/country/id') }}',
-                data: {
-                    country_id: $(this).val()
-                },
-                cache: false,
-                success: function (result) {
-                    console.log(result);
-
-                    $('#state_field_holder').empty();
-                    if (result.length > 0) {
-                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
-                        $.each(result, function (key, state) {
-                            $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
-                        });
-                    } else {
-                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State"><label for="state">State</label></div>');
-                    }
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
-        });
-
-
-
-
         function loadCheckoutItems() {
             $.ajax({
                 method: 'get',
@@ -656,10 +534,46 @@
             });
         }
 
-        function loadDeliveryAddress() {
+
+        //////////////////////////////////////////////////////Shipping Section Start//////////////////////////////////////////////////////////
+
+        $(document).on('change', '#country_id', function () {
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/delivery/address') }}',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $(this).val()
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+
+                    $('#state_field_holder').empty();
+                    if (result.length > 0) {
+                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
+                        $.each(result, function (key, state) {
+                            $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
+                        });
+                    } else {
+                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State"><label for="state">State</label></div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        function clearDeliveryAddressForm() {
+
+        }
+
+        function loadDeliveryAddress() {
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('checkout/get/guest/delivery/address') }}' : '{{ url('checkout/get/account/delivery/address') }}'
+            $.ajax({
+                method: 'get',
+                url: url,
                 success: function (result) {
                     console.log(result);
                     $('#delivery_addresses_container').empty();
@@ -690,6 +604,7 @@
                         $.each(result.payload, function (key, accountShipping) {
                             let selectionStatus = parseInt(accountShipping.is_selected) === 1 ? '<span class="py-1 px-3 bg-light me-3">Selected</span>' : '';
                             let selectionLink = parseInt(accountShipping.is_selected) === 0 ? ' | <a href="javascript:void(0)" class="select_delivery_address" data-id="' + accountShipping.id + '">Select</a>' : '';
+                            let deletionLink = parseInt(accountShipping.is_primary) === 0 ? ' | <a href="javascript:void(0)" class="delete_delivery_address" data-id="' + accountShipping.id + '">Delete</a>' : '';
                             let primaryStatus = parseInt(accountShipping.is_primary) === 1 ? '<span class="py-1 px-3 bg-light">Primary</span>' : '';
                             $('#delivery_addresses_container').append(`
                                 <div class="border-bottom py-3">
@@ -700,12 +615,12 @@
                                     <div>` + accountShipping.state + `</div>
                                     <div>` + accountShipping.country + `</div>
                                     <div>` + accountShipping.phone.substring(0,2) + 'xxxxxxx' + accountShipping.phone.slice(-2) + `</div>
-                                    <div class="mt-1"><a href="javascript:void(0)" class="edit_delivery_address" data-id="` + accountShipping.id + `">Edit</a>` + selectionLink + `</div>
+                                    <div class="mt-1"><a href="javascript:void(0)" class="edit_delivery_address" data-id="` + accountShipping.id + `">Edit</a>` + deletionLink +  selectionLink + `</div>
                                 </div>
                             `);
                         });
                         $('#delivery_addresses_container').append(`
-                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="btn primary_btn_default" id="add_delivery_address">Add New Address</button></div><div class="col d-grid"><button type="button" class="btn btn-danger" id="cancel_change_address">Cancel</button></div></div>
+                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address">Add New Address</button></div><div class="col d-grid"><button type="button" class="mod_button_2" id="cancel_change_address">Cancel</button></div></div>
                         `);
                     }
                 },
@@ -725,7 +640,26 @@
                 cache: false,
                 success: function (result) {
                     console.log(result);
-                    loadDeliveryAddress();
+                    loadDeliveryAddresses();
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        $(document).on('click', '.delete_delivery_address', function () {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/delete/delivery/address') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    loadDeliveryAddresses();
 
                 },
                 error: function (xhr) {
@@ -911,24 +845,73 @@
 
         $(document).on('click', '#cancel_change_address', function () {
             $('#delivery_address_form_container').find('#id').remove();
+            $('#delivery_address_form').find('.invalid-feedback').remove();
+            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
             $('#save_as_primary_address').parent().remove();
+            $('#delivery_address_form')[0].reset();
             $('#delivery_address_form_container').hide(1000);
             loadDeliveryAddress();
         });
 
         $(document).on('click', '#delivery_address_form_cancel_button', function () {
             $('#delivery_address_form_container').find('#id').remove();
+            $('#delivery_address_form').find('.invalid-feedback').remove();
+            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
             $('#save_as_primary_address').parent().remove();
+            $('#delivery_address_form')[0].reset();
             $('#delivery_address_form_container').hide(1000);
             loadDeliveryAddress();
         });
 
+        //////////////////////////////////////////////////////Shipping Section End//////////////////////////////////////////////////////////
 
 
-        function loadBillingAddress() {
+        //////////////////////////////////////////////////////Billing Section Start//////////////////////////////////////////////////////////
+
+
+        $(document).on('change', '#country_id_for_billing', function () {
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/billing/address') }}',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $(this).val()
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+
+                    $('#state_field_holder_for_billing').empty();
+                    if (result.length > 0) {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
+                        $.each(result, function (key, state) {
+                            $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
+                        });
+                    } else {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State"><label for="state_for_billing">State</label></div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+
+        function clearBillingAddressForm() {
+            $('#billing_address_form').find('#id').remove();
+            $('#country_id_for_billing option').removeAttr('selected');
+            $('#state_field_holder_for_billing').empty();
+            $('#billing_address_form').find('.invalid-feedback').remove();
+            $('#billing_address_form').find('.is-invalid').removeClass('is-invalid');
+            $('#billing_address_form')[0].reset();
+        }
+
+
+
+        function loadBillingAddressForAccount() {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/account/billing/address') }}',
                 success: function (result) {
                     console.log(result);
                     $('#billing_address_container').empty();
@@ -939,7 +922,7 @@
                         <div>` + result.payload.state + `</div>
                         <div>` + result.payload.country + `</div>
                         <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address" data-id="` + result.payload.id + `">Edit</a> | <a href="javascript:void(0)" id="change_billing_address">Change</a></div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_account" data-id="` + result.payload.id + `">Edit</a> | <a href="javascript:void(0)" id="change_billing_address_for_account" data-id="` + result.payload.id + `">Change</a></div>
                     `);
                 },
                 error: function (xhr) {
@@ -948,18 +931,44 @@
             });
         }
 
-        $(document).on('click', '#edit_billing_address', function () {
+        function loadBillingAddressForGuest() {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/billing/address') }}',
+                success: function (result) {
+                    console.log(result);
+                    $('#billing_address_container').empty();
+                    $('#billing_address_container').append(`
+                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
+                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
+                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
+                        <div>` + result.payload.state + `</div>
+                        <div>` + result.payload.country + `</div>
+                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_guest">Edit</a> | <a href="javascript:void(0)" id="change_billing_address_for_guest">Change</a></div>
+                    `);
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        }
+
+
+        $(document).on('click', '#edit_billing_address_for_account', function () {
 
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/billing/address/by/id') }}',
+                url: '{{ url('checkout/get/account/billing/address/by/id') }}',
                 data: {
                     id: $(this).data('id')
                 },
                 success: function (result) {
                     console.log(result);
                     $('#billing_address_container').empty();
-                    $('#billing_address_form_container').find('form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
+                    clearBillingAddressForm();
+
+                    $('#billing_address_form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
                     $('#first_name_for_billing').val(result.payload.first_name);
                     $('#last_name_for_billing').val(result.payload.last_name);
                     $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
@@ -1008,10 +1017,114 @@
         });
 
 
-        $(document).on('click', '#change_billing_address', function () {
+        $(document).on('click', '#edit_billing_address_for_guest', function () {
+
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/billing/address') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                success: function (result) {
+                    console.log(result);
+                    $('#billing_address_container').empty();
+                    clearBillingAddressForm();
+
+                    $('#first_name_for_billing').val(result.payload.first_name);
+                    $('#last_name_for_billing').val(result.payload.last_name);
+                    $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
+
+                    $.ajax({
+                        method: 'get',
+                        url: '{{ url('get/states/by/country/id') }}',
+                        data: {
+                            country_id: $('#country_id_for_billing').val()
+                        },
+                        cache: false,
+                        success: function (states) {
+                            console.log(states);
+                            $('#state_field_holder_for_billing').empty();
+                            if (states.length > 0) {
+                                $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
+                                $.each(states, function (key, state) {
+                                    if (result.payload.state === state.state) {
+                                        $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                                    } else {
+                                        $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
+                                    }
+                                });
+                            } else {
+                                $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + result.payload.state + '"><label for="state_for_billing">State</label></div>');
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr);
+                        }
+                    });
+                    $('#city_for_billing').val(result.payload.city);
+                    $('#postal_code_for_billing').val(result.payload.postal_code);
+                    $('#address_line_1_for_billing').val(result.payload.address_line_1);
+                    $('#address_line_2_for_billing').val(result.payload.address_line_2);
+                    $('#phone_for_billing').val(result.payload.phone);
+                    $('#email_for_billing').val(result.payload.email);
+                    $('#billing_address_form_container').show(1000);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+        });
+
+
+        $(document).on('click', '#change_billing_address_for_account', function () {
             $('#billing_address_container').empty();
-            $('#billing_address_form_container').find('form').append('<input type="hidden" name="id" id="id" value="' + $(this).data('id') + '">');
-            $('#billing_address_form')[0].reset();
+            clearBillingAddressForm();
+
+            $('#billing_address_form').append('<input type="hidden" name="id" id="id" value="' + $(this).data('id') + '">');
+
+            let userCountry = '{{ $userCountry }}';
+            let userState = '{{ $userState }}';
+            if (userCountry) {
+                $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);
+            }
+            $.ajax({
+                method: 'get',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $('#country_id_for_billing').val()
+                },
+                cache: false,
+                success: function (states) {
+                    console.log(states);
+                    $('#state_field_holder_for_billing').empty();
+                    if (states.length > 0) {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
+                        $.each(states, function (key, state) {
+                            if (userState === state.state) {
+                                $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                            } else {
+                                $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
+                            }
+                        });
+                    } else {
+                        $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+            $('#billing_address_form_container').show(1000);
+        });
+
+        $(document).on('click', '#change_billing_address_for_guest', function () {
+            $('#billing_address_container').empty();
+            clearBillingAddressForm();
+
             let userCountry = '{{ $userCountry }}';
             let userState = '{{ $userState }}';
             if (userCountry) {
@@ -1056,15 +1169,21 @@
 
         $(document).on('submit', '#billing_address_form', function (event) {
             event.preventDefault();
+
+            $('#billing_address_form').find('.invalid-feedback').remove();
+            $('#billing_address_form').find('.is-invalid').removeClass('is-invalid');
+
             $('#billing_address_form_submit_button').addClass('disabled');
             $('#billing_address_form_submit_button_text').addClass('sr-only');
             $('#billing_address_form_submit_button_processing').removeClass('sr-only');
             let formData = new FormData(this);
             formData.append('_token', '{{ csrf_token() }}');
 
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('checkout/save/billing/address/for/guest') }}' : '{{ url('checkout/save/billing/address/for/account') }}';
             $.ajax({
                 method: 'post',
-                url: '{{ url('checkout/save/billing/address') }}',
+                url: url,
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -1075,9 +1194,14 @@
                     $('#billing_address_form_submit_button').removeClass('disabled');
                     $('#billing_address_form_submit_button_text').removeClass('sr-only');
                     $('#billing_address_form_submit_button_processing').addClass('sr-only');
-                    $('#billing_address_form_container').find('#id').remove();
+                    clearBillingAddressForm();
                     $('#billing_address_form_container').hide(1000);
-                    loadBillingAddress();
+
+                    if (isGuest) {
+                        loadBillingAddressForGuest();
+                    } else {
+                        loadBillingAddressForAccount();
+                    }
 
                 },
                 error: function (xhr) {
@@ -1088,10 +1212,10 @@
                     if (xhr.responseJSON.hasOwnProperty('errors')) {
 
                         $.each(xhr.responseJSON.errors, function (key, value) {
-                            $('#' + key).after('<div class="invalid-feedback"></div>');
-                            $('#' + key).addClass('is-invalid');
+                            $('#' + key + '_for_billing').after('<div class="invalid-feedback"></div>');
+                            $('#' + key + '_for_billing').addClass('is-invalid');
                             $.each(value, function (k, v) {
-                                $('#' + key).parent().find('.invalid-feedback').append('<div>' + v + '</div>');
+                                $('#' + key + '_for_billing').parent().find('.invalid-feedback').append('<div>' + v + '</div>');
                             });
                         })
                     }
@@ -1101,24 +1225,35 @@
         });
 
         $(document).on('click', '#billing_address_form_cancel_button', function () {
-            $('#billing_address_form_container').find('#id').remove();
+            clearBillingAddressForm();
             $('#billing_address_form_container').hide(1000);
-            loadBillingAddress();
+            let isGuest = '{{ $isGuest }}';
+            if (isGuest) {
+                loadBillingAddressForGuest();
+            } else {
+                loadBillingAddressForAccount();
+            }
         });
+
+
+        //////////////////////////////////////////////////////Billing Section End//////////////////////////////////////////////////////////
 
 
 
         $(document).ready(function () {
 
+            let isGuest = '{{ $isGuest }}';
             loadCheckoutItems();
             loadDeliveryAddress();
-            loadBillingAddress();
+            if (isGuest) {
+                loadBillingAddressForGuest();
+            } else {
+                loadBillingAddressForAccount();
+            }
 
-            $('#delivery_address_form_container').find('#id').remove();
-            $('#save_as_primary_address').parent().remove();
+
+
             $('#delivery_address_form_container').hide();
-
-            $('#billing_address_form_container').find('#id').remove();
             $('#billing_address_form_container').hide();
 
             $('#payment_method_card_details').hide();

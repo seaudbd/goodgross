@@ -29,14 +29,21 @@ class DeliveryAddressController extends Controller
         }
         $countries = Country::where('status', 'Active')->get();
         $states = State::where('status', 'Active')->get();
-        $userAccount = auth()->user()->account;
-        $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
 
-        return view('Frontend.delivery_address', compact('title', 'activeNav', 'userCountry', 'userState', 'countries', 'states', 'userAccount', 'userAccountDetails'));
+        $isGuest = false;
+        if (auth()->check()) {
+            $userAccount = auth()->user()->account;
+            $userAccountDetails = auth()->user()->account->type === 'Personal' ? auth()->user()->account->personalAccount : auth()->user()->account->businessAccount;
+            return view('Frontend.delivery_address', compact('title', 'activeNav', 'userCountry', 'userState', 'countries', 'states', 'userAccount', 'userAccountDetails', 'isGuest'));
+        } else {
+            $isGuest = true;
+            return view('Frontend.delivery_address', compact('title', 'activeNav', 'userCountry', 'userState', 'countries', 'states', 'isGuest'));
+        }
     }
 
-    public function saveDeliveryAddress(DeliveryAddressRequest $request)
+    public function storeInDatabase(DeliveryAddressRequest $request)
     {
+
         $country = Country::where('id', $request->country_id)->first()->country;
         $accountShipping = new AccountShipping();
         $accountShipping->account_id = auth()->user()->account->id;
@@ -71,6 +78,16 @@ class DeliveryAddressController extends Controller
         $accountBilling->save();
 
 
+        return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
+    }
+
+    public function storeInSession(DeliveryAddressRequest $request)
+    {
+        $country = Country::where('id', $request->country_id)->first()->country;
+        $deliveryAddress = $request->except(['_token', 'country_id']);
+        $deliveryAddress['country'] = $country;
+        Session::put('delivery_address_for_guest', $deliveryAddress);
+        Session::put('billing_address_for_guest', $deliveryAddress);
         return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
     }
 }

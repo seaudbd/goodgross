@@ -78,7 +78,8 @@ Route::post('product/add/to/session', [ProductController::class, 'addWholesaleIt
 
 ////////////////////////////////////Delivery Address/////////////////////////////////////
 Route::get('delivery/address', [DeliveryAddressController::class, 'loadDeliveryAddress']);
-Route::post('delivery/address/save', [DeliveryAddressController::class, 'saveDeliveryAddress']);
+Route::post('delivery/address/store/in/database', [DeliveryAddressController::class, 'storeInDatabase']);
+Route::post('delivery/address/store/in/session', [DeliveryAddressController::class, 'storeInSession']);
 
 /////////////////////////////////////////////////////////Cart//////////////////////////////////////////////////////
 Route::get('cart', [CartController::class, 'index']);
@@ -95,14 +96,18 @@ Route::get('checkout', [CheckoutController::class, 'loadCheckout']);
 
 Route::get('checkout/get/items', [CheckoutController::class, 'getItems']);
 Route::get('checkout/get/delivery/addresses', [CheckoutController::class, 'getDeliveryAddresses']);
-Route::get('checkout/get/delivery/address', [CheckoutController::class, 'getDeliveryAddress']);
+Route::get('checkout/get/account/delivery/address', [CheckoutController::class, 'getAccountDeliveryAddress']);
+Route::get('checkout/get/guest/delivery/address', [CheckoutController::class, 'getGuestDeliveryAddress']);
 Route::get('checkout/select/delivery/address', [CheckoutController::class, 'selectDeliveryAddress']);
+Route::get('checkout/delete/delivery/address', [CheckoutController::class, 'deleteDeliveryAddress']);
 Route::get('checkout/get/delivery/address/by/id', [CheckoutController::class, 'getDeliveryAddressById']);
 Route::post('checkout/save/delivery/address', [CheckoutController::class, 'saveDeliveryAddress']);
 
-Route::get('checkout/get/billing/address', [CheckoutController::class, 'getBillingAddress']);
-Route::get('checkout/get/billing/address/by/id', [CheckoutController::class, 'getBillingAddressById']);
-Route::post('checkout/save/billing/address', [CheckoutController::class, 'saveBillingAddress']);
+Route::get('checkout/get/account/billing/address', [CheckoutController::class, 'getAccountBillingAddress']);
+Route::get('checkout/get/guest/billing/address', [CheckoutController::class, 'getGuestBillingAddress']);
+Route::get('checkout/get/account/billing/address/by/id', [CheckoutController::class, 'getAccountBillingAddressById']);
+Route::post('checkout/save/billing/address/for/account', [CheckoutController::class, 'saveBillingAddressForAccount']);
+Route::post('checkout/save/billing/address/for/guest', [CheckoutController::class, 'saveBillingAddressForGuest']);
 
 //Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
 Route::post('checkout', [CheckoutController::class, 'processCheckout']);

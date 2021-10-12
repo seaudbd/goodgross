@@ -28,17 +28,231 @@
 
 
                         <form id="delivery_address_form">
-                            @if($userAccount->type === 'Personal')
+                            @if($isGuest === false)
+                                @if($userAccount->type === 'Personal')
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name" value="{{ $userAccountDetails->first_name }}">
+                                                <label for="first_name">First Name</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name" value="{{ $userAccountDetails->last_name }}">
+                                                <label for="last_name">Last Name</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <select class="form-select" name="country_id" id="country_id">
+                                                    <option value="">Select Country</option>
+                                                    @foreach($countries as $country)
+                                                        @if($country->country === $userCountry)
+                                                            <option value="{{ $country->id }}" selected>{{ $country->country }}</option>
+                                                        @else
+                                                            <option value="{{ $country->id }}">{{ $country->country }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                <label for="country_id">Country</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div id="state_field_holder">
+                                                <div class="form-floating">
+                                                    @if($userCountry === 'United States')
+                                                        <select class="form-select" name="state" id="state">
+                                                            <option value="">Select State</option>
+                                                            @foreach($states as $state)
+                                                                @if($state->state === $userState)
+                                                                    <option value="{{ $state->state }}" selected>{{ $state->state }}</option>
+                                                                @else
+                                                                    <option value="{{ $state->state }}">{{ $state->state }}</option>
+                                                                @endif
+                                                            @endforeach
+
+                                                        </select>
+                                                    @else
+                                                        <input type="text" class="form-control" name="state" id="state" placeholder="State">
+                                                    @endif
+                                                    <label for="state">State</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="city" id="city" placeholder="City">
+                                                <label for="city">City</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="postal_code" id="postal_code" placeholder="Postal Code">
+                                                <label for="postal_code">Postal Code</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <textarea class="form-control" id="address_line_1" name="address_line_1" placeholder="Address Line 1"></textarea>
+                                                <label for="address_line_1">Address Line 1</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" id="address_line_2" name="address_line_2" placeholder="Address Line 2"></textarea>
+                                                <label for="address_line_2">Address Line 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="{{ $userAccountDetails->phone }}">
+                                                <label for="phone">Phone</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="{{ $userAccountDetails->email }}">
+                                                <label for="email">Email</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                @elseif($userAccount->type === 'Business')
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name">
+                                                <label for="first_name">First Name</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name">
+                                                <label for="last_name">Last Name</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <select class="form-select" name="country_id" id="country_id">
+                                                    <option value="">Select Country</option>
+                                                    @foreach($countries as $country)
+                                                        @if($country->country === $userAccountDetails->country)
+                                                            <option value="{{ $country->id }}" selected>{{ $country->country }}</option>
+                                                        @else
+                                                            <option value="{{ $country->id }}">{{ $country->country }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                <label for="country_id">Country</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div id="state_field_holder">
+                                                <div class="form-floating">
+                                                    @if($userCountry === 'United States')
+                                                        <select class="form-select" name="state" id="state">
+                                                            <option value="">Select State</option>
+                                                            @foreach($states as $state)
+                                                                @if($state->state === $userAccountDetails->state)
+                                                                    <option value="{{ $state->state }}" selected>{{ $state->state }}</option>
+                                                                @else
+                                                                    <option value="{{ $state->state }}">{{ $state->state }}</option>
+                                                                @endif
+                                                            @endforeach
+
+                                                        </select>
+                                                    @else
+                                                        <input type="text" class="form-control" name="state" id="state" placeholder="State" value="{{ $userAccountDetails->state }}">
+                                                    @endif
+                                                    <label for="state">State</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="city" id="city" placeholder="City">
+                                                <label for="city">City</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="postal_code" id="postal_code" placeholder="Postal Code">
+                                                <label for="postal_code">Postal Code</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <textarea class="form-control" id="address_line_1" name="address_line_1" placeholder="Address Line 1"></textarea>
+                                                <label for="address_line_1">Address Line 1</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" id="address_line_2" name="address_line_2" placeholder="Address Line 2"></textarea>
+                                                <label for="address_line_2">Address Line 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating mb-4 mb-sm-0">
+                                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="{{ $userAccountDetails->phone }}">
+                                                <label for="phone">Phone</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="{{ $userAccountDetails->email }}">
+                                                <label for="email">Email</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                @else
+
+
+                                @endif
+
+                            @else
+
+
                                 <div class="row mb-4">
                                     <div class="col-12 col-sm-6">
                                         <div class="form-floating mb-4 mb-sm-0">
-                                            <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name" value="{{ $userAccountDetails->first_name }}">
+                                            <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name">
                                             <label for="first_name">First Name</label>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-6">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name" value="{{ $userAccountDetails->last_name }}">
+                                            <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name">
                                             <label for="last_name">Last Name</label>
                                         </div>
                                     </div>
@@ -117,127 +331,22 @@
                                 <div class="row mb-4">
                                     <div class="col-12 col-sm-6">
                                         <div class="form-floating mb-4 mb-sm-0">
-                                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="{{ $userAccountDetails->phone }}">
+                                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone">
                                             <label for="phone">Phone</label>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-6">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="{{ $userAccountDetails->email }}">
+                                            <input type="text" class="form-control" name="email" id="email" placeholder="Email">
                                             <label for="email">Email</label>
                                         </div>
                                     </div>
                                 </div>
 
-
-                            @elseif($userAccount->type === 'Business')
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating mb-4 mb-sm-0">
-                                            <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name">
-                                            <label for="first_name">First Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name">
-                                            <label for="last_name">Last Name</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating mb-4 mb-sm-0">
-                                            <select class="form-select" name="country_id" id="country_id">
-                                                <option value="">Select Country</option>
-                                                @foreach($countries as $country)
-                                                    @if($country->country === $userAccountDetails->country)
-                                                        <option value="{{ $country->id }}" selected>{{ $country->country }}</option>
-                                                    @else
-                                                        <option value="{{ $country->id }}">{{ $country->country }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                            <label for="country_id">Country</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div id="state_field_holder">
-                                            <div class="form-floating">
-                                                @if($userCountry === 'United States')
-                                                    <select class="form-select" name="state" id="state">
-                                                        <option value="">Select State</option>
-                                                        @foreach($states as $state)
-                                                            @if($state->state === $userAccountDetails->state)
-                                                                <option value="{{ $state->state }}" selected>{{ $state->state }}</option>
-                                                            @else
-                                                                <option value="{{ $state->state }}">{{ $state->state }}</option>
-                                                            @endif
-                                                        @endforeach
-
-                                                    </select>
-                                                @else
-                                                    <input type="text" class="form-control" name="state" id="state" placeholder="State" value="{{ $userAccountDetails->state }}">
-                                                @endif
-                                                <label for="state">State</label>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating mb-4 mb-sm-0">
-                                            <input type="text" class="form-control" name="city" id="city" placeholder="City">
-                                            <label for="city">City</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="postal_code" id="postal_code" placeholder="Postal Code">
-                                            <label for="postal_code">Postal Code</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating mb-4 mb-sm-0">
-                                            <textarea class="form-control" id="address_line_1" name="address_line_1" placeholder="Address Line 1"></textarea>
-                                            <label for="address_line_1">Address Line 1</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" id="address_line_2" name="address_line_2" placeholder="Address Line 2"></textarea>
-                                            <label for="address_line_2">Address Line 2</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating mb-4 mb-sm-0">
-                                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="{{ $userAccountDetails->phone }}">
-                                            <label for="phone">Phone</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="{{ $userAccountDetails->email }}">
-                                            <label for="email">Email</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
-                            @else
 
 
                             @endif
+
 
 
                             <div class="row mb-4">
@@ -322,9 +431,11 @@
             formData.append('_token', '{{ csrf_token() }}');
             formData.append('is_primary', '1');
             formData.append('is_selected', '1');
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('delivery/address/store/in/session') }}' : '{{ url('delivery/address/store/in/database') }}';
             $.ajax({
                 method: 'post',
-                url: '{{ url('delivery/address/save') }}',
+                url: url,
                 data: formData,
                 contentType: false,
                 processData: false,
