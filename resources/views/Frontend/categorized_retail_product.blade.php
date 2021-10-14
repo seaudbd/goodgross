@@ -933,15 +933,27 @@
                 contentType: false,
                 success: function (cartResult) {
                     console.log(cartResult);
-
-
                     $.ajax({
                         method: 'get',
                         url: '{{ url('cart/copy/items/to/checkout') }}',
                         success: function (checkoutResult) {
                             console.log(checkoutResult);
-                            location = '{{ url('delivery/address') }}';
 
+                            $.ajax({
+                                method: 'get',
+                                url: '{{ url('is/guest/delivery/address/exist') }}',
+                                success: function (deliveryAddressResult) {
+                                    console.log(deliveryAddressResult);
+                                    if (deliveryAddressResult.payload === null) {
+                                        location = '{{ url('delivery/address') }}';
+                                    } else {
+                                        location = '{{ url('checkout') }}';
+                                    }
+                                },
+                                error: function (xhr) {
+                                    console.log(xhr)
+                                }
+                            });
                         },
                         error: function (xhr) {
                             console.log(xhr)

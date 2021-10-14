@@ -24,6 +24,7 @@ use App\Models\Product;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
@@ -91,44 +92,44 @@ class CheckoutController extends Controller
 
     }
 
-    public function getItems()
+    public function getItems(): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Checkout Items Fetched Successfully', 'payload' => Session::get('checkout_items')]);
     }
 
-    public function getDeliveryAddresses()
+    public function getAccountDeliveryAddresses(): JsonResponse
     {
         $accountShippings = AccountShipping::where('account_id', auth()->user()->account->id)->orderBy('is_primary', 'desc')->get();
         return response()->json(['success' => true, 'message' => 'Delivery Addresses Fetched Successfully', 'payload' => $accountShippings]);
     }
 
-    public function getAccountDeliveryAddress()
+    public function getAccountDeliveryAddress(): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Account Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_primary', 1)->first()]);
     }
 
-    public function getGuestDeliveryAddress()
+    public function getGuestDeliveryAddress(): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Guest Delivery Address Fetched Successfully', 'payload' => Session::get('delivery_address_for_guest')]);
     }
-    public function selectDeliveryAddress(Request $request)
+    public function selectAccountDeliveryAddress(Request $request): JsonResponse
     {
         AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
         AccountShipping::where('id', $request->id)->update(['is_selected' => 1]);
         return response()->json(['success' => true, 'message' => 'Delivery Address Selected Successfully', 'payload' => null]);
     }
 
-    public function deleteDeliveryAddress(Request $request)
+    public function deleteAccountDeliveryAddress(Request $request): JsonResponse
     {
         AccountShipping::where('id', $request->id)->delete();
         return response()->json(['success' => true, 'message' => 'Delivery Address Deleted Successfully', 'payload' => null]);
     }
-    public function getDeliveryAddressById(Request $request)
+    public function getAccountDeliveryAddressById(Request $request): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('id', $request->id)->first()]);
     }
 
-    public function saveDeliveryAddress(DeliveryAddressRequest $request)
+    public function saveAccountDeliveryAddress(DeliveryAddressRequest $request): JsonResponse
     {
         $country = Country::where('id', $request->country_id)->first()->country;
         $accountShipping = $request->has('id') ? AccountShipping::find($request->id) : new AccountShipping();
@@ -168,24 +169,34 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
     }
 
+    public function saveGuestDeliveryAddress(DeliveryAddressRequest $request): JsonResponse
+    {
+        $country = Country::where('id', $request->country_id)->first()->country;
+        $deliveryAddress = $request->except(['_token', 'country_id']);
+        $deliveryAddress['country'] = $country;
+        Session::forget('delivery_address_for_guest');
+        Session::put('delivery_address_for_guest', $deliveryAddress);
+        return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
+    }
 
-    public function getAccountBillingAddress()
+
+    public function getAccountBillingAddress(): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Account Billing Address Fetched Successfully', 'payload' => AccountBilling::where('account_id', auth()->user()->account->id)->first()]);
     }
 
-    public function getGuestBillingAddress()
+    public function getGuestBillingAddress(): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Guest Billing Address Fetched Successfully', 'payload' => Session::get('billing_address_for_guest')]);
     }
 
-    public function getAccountBillingAddressById(Request $request)
+    public function getAccountBillingAddressById(Request $request): JsonResponse
     {
         return response()->json(['success' => true, 'message' => 'Billing Address Fetched Successfully', 'payload' => AccountBilling::where('id', $request->id)->first()]);
     }
 
 
-    public function saveBillingAddressForAccount(DeliveryAddressRequest $request)
+    public function saveBillingAddressForAccount(DeliveryAddressRequest $request): JsonResponse
     {
         $country = Country::where('id', $request->country_id)->first()->country;
         $accountBilling = AccountBilling::find($request->id);
@@ -204,7 +215,7 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
     }
 
-    public function saveBillingAddressForGuest(DeliveryAddressRequest $request)
+    public function saveBillingAddressForGuest(DeliveryAddressRequest $request): JsonResponse
     {
         $country = Country::where('id', $request->country_id)->first()->country;
         $billingAddress = $request->except(['_token', 'country_id']);
@@ -214,10 +225,18 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
     }
 
-    public function isShippingAddressAvailable()
+    public function isShippingAddressAvailable(): JsonResponse
     {
         $accountShippings = auth()->user()->account->accountShippings;
         return response()->json(['success' => true, 'message' => 'Shipping Address Information', 'payload' => $accountShippings]);
+    }
+
+    public function isGuestDeliveryAddressExist(): JsonResponse
+    {
+        if (Session::has('delivery_address_for_guest')) {
+            return response()->json(['success' => true, 'message' => 'Guest Delivery Address Information', 'payload' => Session::get('delivery_address_for_guest')]);
+        }
+        return response()->json(['success' => true, 'message' => 'Guest Delivery Address Information', 'payload' => null]);
     }
 
 

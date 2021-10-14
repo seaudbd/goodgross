@@ -199,7 +199,7 @@
                     </div>
 
                     <div style="width: 100%; text-align: center; border-bottom: 1px solid #e8f3ed; line-height: 0.1em; margin: 10px 0 20px;"><span style="background:#fff; padding:0 10px;">Or</span></div>
-                    <div class="text-center my-4"><button type="button" class="btn primary_btn_default">Continue as Guest</button></div>
+                    <div class="text-center my-4"><button type="button" id="continue_as_guest" class="btn primary_btn_default">Continue as Guest</button></div>
 
 
 
@@ -655,7 +655,35 @@
 
 
 
+        $(document).on('click', '#continue_as_guest', function () {
+            $('#sign_in_modal .btn-close').click();
+            $.ajax({
+                method: 'get',
+                url: '{{ url('cart/copy/items/to/checkout') }}',
+                success: function (checkoutResult) {
+                    console.log(checkoutResult);
 
+                    $.ajax({
+                        method: 'get',
+                        url: '{{ url('is/guest/delivery/address/exist') }}',
+                        success: function (deliveryAddressResult) {
+                            console.log(deliveryAddressResult);
+                            if (deliveryAddressResult.payload === null) {
+                                location = '{{ url('delivery/address') }}';
+                            } else {
+                                location = '{{ url('checkout') }}';
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr)
+                        }
+                    });
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        });
 
 
 

@@ -60,6 +60,7 @@ Route::get('regenerate/csrf/token', function() {
 
 Route::get('check/account/login/status', [SignInController::class, 'checkAccountLoginStatus']);
 Route::get('is/shipping/address/available', [CheckoutController::class, 'isShippingAddressAvailable']);
+Route::get('is/guest/delivery/address/exist', [CheckoutController::class, 'isGuestDeliveryAddressExist']);
 
 
 ////////////////////////////////////////////////////////////HOME PAGE////////////////////////////////////////////////////////////////////////////////
@@ -95,13 +96,15 @@ Route::get('checkout', [CheckoutController::class, 'loadCheckout']);
 
 
 Route::get('checkout/get/items', [CheckoutController::class, 'getItems']);
-Route::get('checkout/get/delivery/addresses', [CheckoutController::class, 'getDeliveryAddresses']);
+
+Route::get('checkout/get/account/delivery/addresses', [CheckoutController::class, 'getAccountDeliveryAddresses']);
 Route::get('checkout/get/account/delivery/address', [CheckoutController::class, 'getAccountDeliveryAddress']);
 Route::get('checkout/get/guest/delivery/address', [CheckoutController::class, 'getGuestDeliveryAddress']);
-Route::get('checkout/select/delivery/address', [CheckoutController::class, 'selectDeliveryAddress']);
-Route::get('checkout/delete/delivery/address', [CheckoutController::class, 'deleteDeliveryAddress']);
-Route::get('checkout/get/delivery/address/by/id', [CheckoutController::class, 'getDeliveryAddressById']);
-Route::post('checkout/save/delivery/address', [CheckoutController::class, 'saveDeliveryAddress']);
+Route::get('checkout/select/account/delivery/address', [CheckoutController::class, 'selectAccountDeliveryAddress']);
+Route::get('checkout/delete/account/delivery/address', [CheckoutController::class, 'deleteAccountDeliveryAddress']);
+Route::get('checkout/get/account/delivery/address/by/id', [CheckoutController::class, 'getAccountDeliveryAddressById']);
+Route::post('checkout/save/account/delivery/address', [CheckoutController::class, 'saveAccountDeliveryAddress']);
+Route::post('checkout/save/guest/delivery/address', [CheckoutController::class, 'saveGuestDeliveryAddress']);
 
 Route::get('checkout/get/account/billing/address', [CheckoutController::class, 'getAccountBillingAddress']);
 Route::get('checkout/get/guest/billing/address', [CheckoutController::class, 'getGuestBillingAddress']);

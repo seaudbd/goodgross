@@ -565,15 +565,19 @@
         });
 
         function clearDeliveryAddressForm() {
-
+            $('#delivery_address_form').find('#id').remove();
+            $('#save_as_primary_delivery_address').parent().remove();
+            $('#country_id option').removeAttr('selected');
+            $('#state_field_holder').empty();
+            $('#delivery_address_form').find('.invalid-feedback').remove();
+            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
+            $('#delivery_address_form')[0].reset();
         }
 
-        function loadDeliveryAddress() {
-            let isGuest = '{{ $isGuest }}';
-            let url = isGuest ? '{{ url('checkout/get/guest/delivery/address') }}' : '{{ url('checkout/get/account/delivery/address') }}'
+        function loadDeliveryAddressForAccount() {
             $.ajax({
                 method: 'get',
-                url: url,
+                url: '{{ url('checkout/get/account/delivery/address') }}',
                 success: function (result) {
                     console.log(result);
                     $('#delivery_addresses_container').empty();
@@ -584,7 +588,7 @@
                         <div>` + result.payload.state + `</div>
                         <div>` + result.payload.country + `</div>
                         <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="change_delivery_address">Change</a></div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="change_delivery_address_for_account">Change</a></div>
                     `);
                 },
                 error: function (xhr) {
@@ -593,18 +597,41 @@
             });
         }
 
-        function loadDeliveryAddresses() {
+        function loadDeliveryAddressForGuest() {
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/delivery/addresses') }}',
+                url: '{{ url('checkout/get/guest/delivery/address') }}',
+                success: function (result) {
+                    console.log(result);
+                    $('#delivery_addresses_container').empty();
+                    $('#delivery_addresses_container').append(`
+                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
+                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
+                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
+                        <div>` + result.payload.state + `</div>
+                        <div>` + result.payload.country + `</div>
+                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_delivery_address_for_guest">Edit</a> | <a href="javascript:void(0)" id="change_delivery_address_for_guest">Change</a></div>
+                    `);
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        }
+
+        function loadDeliveryAddressesForAccount() {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/account/delivery/addresses') }}',
                 success: function (result) {
                     console.log(result);
                     $('#delivery_addresses_container').empty();
                     if (result.payload.length > 0) {
                         $.each(result.payload, function (key, accountShipping) {
                             let selectionStatus = parseInt(accountShipping.is_selected) === 1 ? '<span class="py-1 px-3 bg-light me-3">Selected</span>' : '';
-                            let selectionLink = parseInt(accountShipping.is_selected) === 0 ? ' | <a href="javascript:void(0)" class="select_delivery_address" data-id="' + accountShipping.id + '">Select</a>' : '';
-                            let deletionLink = parseInt(accountShipping.is_primary) === 0 ? ' | <a href="javascript:void(0)" class="delete_delivery_address" data-id="' + accountShipping.id + '">Delete</a>' : '';
+                            let selectionLink = parseInt(accountShipping.is_selected) === 0 ? ' | <a href="javascript:void(0)" class="select_delivery_address_for_account" data-id="' + accountShipping.id + '">Select</a>' : '';
+                            let deletionLink = parseInt(accountShipping.is_primary) === 0 ? ' | <a href="javascript:void(0)" class="delete_delivery_address_for_account" data-id="' + accountShipping.id + '">Delete</a>' : '';
                             let primaryStatus = parseInt(accountShipping.is_primary) === 1 ? '<span class="py-1 px-3 bg-light">Primary</span>' : '';
                             $('#delivery_addresses_container').append(`
                                 <div class="border-bottom py-3">
@@ -615,12 +642,12 @@
                                     <div>` + accountShipping.state + `</div>
                                     <div>` + accountShipping.country + `</div>
                                     <div>` + accountShipping.phone.substring(0,2) + 'xxxxxxx' + accountShipping.phone.slice(-2) + `</div>
-                                    <div class="mt-1"><a href="javascript:void(0)" class="edit_delivery_address" data-id="` + accountShipping.id + `">Edit</a>` + deletionLink +  selectionLink + `</div>
+                                    <div class="mt-1"><a href="javascript:void(0)" class="edit_delivery_address_for_account" data-id="` + accountShipping.id + `">Edit</a>` + deletionLink +  selectionLink + `</div>
                                 </div>
                             `);
                         });
                         $('#delivery_addresses_container').append(`
-                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address">Add New Address</button></div><div class="col d-grid"><button type="button" class="mod_button_2" id="cancel_change_address">Cancel</button></div></div>
+                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address_for_account">Add New Address</button></div><div class="col d-grid"><button type="button" class="mod_button_2" id="cancel_change_delivery_address_for_account">Cancel</button></div></div>
                         `);
                     }
                 },
@@ -630,17 +657,17 @@
             });
         }
 
-        $(document).on('click', '.select_delivery_address', function () {
+        $(document).on('click', '.select_delivery_address_for_account', function () {
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/select/delivery/address') }}',
+                url: '{{ url('checkout/select/account/delivery/address') }}',
                 data: {
                     id: $(this).data('id')
                 },
                 cache: false,
                 success: function (result) {
                     console.log(result);
-                    loadDeliveryAddresses();
+                    loadDeliveryAddressesForAccount();
 
                 },
                 error: function (xhr) {
@@ -649,17 +676,17 @@
             });
         });
 
-        $(document).on('click', '.delete_delivery_address', function () {
+        $(document).on('click', '.delete_delivery_address_for_account', function () {
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/delete/delivery/address') }}',
+                url: '{{ url('checkout/delete/account/delivery/address') }}',
                 data: {
                     id: $(this).data('id')
                 },
                 cache: false,
                 success: function (result) {
                     console.log(result);
-                    loadDeliveryAddresses();
+                    loadDeliveryAddressesForAccount();
 
                 },
                 error: function (xhr) {
@@ -668,14 +695,13 @@
             });
         });
 
-        $(document).on('click', '#change_delivery_address', function () {
-            loadDeliveryAddresses();
+        $(document).on('click', '#change_delivery_address_for_account', function () {
+            loadDeliveryAddressesForAccount();
         });
 
-        $(document).on('click', '#add_delivery_address', function () {
+        $(document).on('click', '#add_delivery_address_for_account', function () {
             $('#delivery_addresses_container').empty();
-            $('#delivery_address_form_container').find('#id').remove();
-            $('#delivery_address_form')[0].reset();
+            clearDeliveryAddressForm();
             let userCountry = '{{ $userCountry }}';
             let userState = '{{ $userState }}';
             if (userCountry) {
@@ -703,34 +729,36 @@
                     } else {
                         $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + userState + '"><label for="state">State</label></div>');
                     }
+                    $('#delivery_address_form_submit_button').parent().parent().before(`
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" value="" id="save_as_primary_delivery_address">
+                            <label class="form-check-label" for="save_as_primary_delivery_address">
+                                Save as Primary Address
+                            </label>
+                        </div>
+                    `);
+                    $('#delivery_address_form_container').show(1000);
                 },
                 error: function (xhr) {
                     console.log(xhr);
                 }
             });
-            $('#delivery_address_form_submit_button').parent().parent().before(`
-                <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" value="" id="save_as_primary_address">
-                    <label class="form-check-label" for="save_as_primary_address">
-                        Save as Primary Address
-                    </label>
-                </div>
-            `);
-            $('#delivery_address_form_container').show(1000);
+
         });
 
-        $(document).on('click', '.edit_delivery_address', function () {
+        $(document).on('click', '.edit_delivery_address_for_account', function () {
 
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/delivery/address/by/id') }}',
+                url: '{{ url('checkout/get/account/delivery/address/by/id') }}',
                 data: {
                     id: $(this).data('id')
                 },
                 success: function (result) {
                     console.log(result);
                     $('#delivery_addresses_container').empty();
-                    $('#delivery_address_form_container').find('form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
+                    clearDeliveryAddressForm();
+                    $('#delivery_address_form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
                     $('#first_name').val(result.payload.first_name);
                     $('#last_name').val(result.payload.last_name);
                     $('#country_id option:contains(' + result.payload.country + ')').attr('selected', true);
@@ -757,29 +785,30 @@
                             } else {
                                 $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + result.payload.state + '"><label for="state">State</label></div>');
                             }
+                            $('#city').val(result.payload.city);
+                            $('#postal_code').val(result.payload.postal_code);
+                            $('#address_line_1').val(result.payload.address_line_1);
+                            $('#address_line_2').val(result.payload.address_line_2);
+                            $('#phone').val(result.payload.phone);
+                            $('#email').val(result.payload.email);
+                            if (result.payload.is_primary === 0) {
+                                $('#delivery_address_form_submit_button').parent().parent().before(`
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input" type="checkbox" value="" id="save_as_primary_delivery_address">
+                                        <label class="form-check-label" for="save_as_primary_delivery_address">
+                                            Save as Primary Address
+                                        </label>
+                                    </div>
+                                `);
+                            }
+
+                            $('#delivery_address_form_container').show(1000);
                         },
                         error: function (xhr) {
                             console.log(xhr);
                         }
                     });
-                    $('#city').val(result.payload.city);
-                    $('#postal_code').val(result.payload.postal_code);
-                    $('#address_line_1').val(result.payload.address_line_1);
-                    $('#address_line_2').val(result.payload.address_line_2);
-                    $('#phone').val(result.payload.phone);
-                    $('#email').val(result.payload.email);
-                    if (result.payload.is_primary === 0) {
-                        $('#delivery_address_form_submit_button').parent().parent().before(`
-                            <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" value="" id="save_as_primary_address">
-                                <label class="form-check-label" for="save_as_primary_address">
-                                    Save as Primary Address
-                                </label>
-                            </div>
-                        `);
-                    }
 
-                    $('#delivery_address_form_container').show(1000);
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -790,22 +819,132 @@
         });
 
 
+        $(document).on('click', '#edit_delivery_address_for_guest', function () {
+
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/delivery/address') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                success: function (result) {
+                    console.log(result);
+                    $('#delivery_addresses_container').empty();
+                    clearDeliveryAddressForm();
+
+                    $('#first_name').val(result.payload.first_name);
+                    $('#last_name').val(result.payload.last_name);
+                    $('#country_id option:contains(' + result.payload.country + ')').attr('selected', true);
+
+                    $.ajax({
+                        method: 'get',
+                        url: '{{ url('get/states/by/country/id') }}',
+                        data: {
+                            country_id: $('#country_id').val()
+                        },
+                        cache: false,
+                        success: function (states) {
+                            console.log(states);
+                            $('#state_field_holder').empty();
+                            if (states.length > 0) {
+                                $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
+                                $.each(states, function (key, state) {
+                                    if (result.payload.state === state.state) {
+                                        $('#state').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                                    } else {
+                                        $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
+                                    }
+                                });
+                            } else {
+                                $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + result.payload.state + '"><label for="state">State</label></div>');
+                            }
+                            $('#city').val(result.payload.city);
+                            $('#postal_code').val(result.payload.postal_code);
+                            $('#address_line_1').val(result.payload.address_line_1);
+                            $('#address_line_2').val(result.payload.address_line_2);
+                            $('#phone').val(result.payload.phone);
+                            $('#email').val(result.payload.email);
+                            $('#delivery_address_form_container').show(1000);
+                        },
+                        error: function (xhr) {
+                            console.log(xhr);
+                        }
+                    });
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+        });
+
+
+        $(document).on('click', '#change_delivery_address_for_guest', function () {
+            $('#delivery_addresses_container').empty();
+            clearDeliveryAddressForm();
+
+            let userCountry = '{{ $userCountry }}';
+            let userState = '{{ $userState }}';
+            if (userCountry) {
+                $('#country_id option:contains(' + userCountry + ')').attr('selected', true);
+            }
+            $.ajax({
+                method: 'get',
+                url: '{{ url('get/states/by/country/id') }}',
+                data: {
+                    country_id: $('#country_id').val()
+                },
+                cache: false,
+                success: function (states) {
+                    console.log(states);
+                    $('#state_field_holder').empty();
+                    if (states.length > 0) {
+                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
+                        $.each(states, function (key, state) {
+                            if (userState === state.state) {
+                                $('#state').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
+                            } else {
+                                $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
+                            }
+                        });
+                    } else {
+                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + userState + '"><label for="state">State</label></div>');
+                    }
+                    $('#delivery_address_form_container').show(1000);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+
+
+        });
+
+
 
 
 
         $(document).on('submit', '#delivery_address_form', function (event) {
             event.preventDefault();
+            $('#delivery_address_form').find('.invalid-feedback').remove();
+            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
+
             $('#delivery_address_form_submit_button').addClass('disabled');
             $('#delivery_address_form_submit_button_text').addClass('sr-only');
             $('#delivery_address_form_submit_button_processing').removeClass('sr-only');
             let formData = new FormData(this);
             formData.append('_token', '{{ csrf_token() }}');
-            if ($('#save_as_primary_address').length > 0) {
-                formData.append('is_primary', $('#save_as_primary_address').prop('checked'));
+            if ($('#save_as_primary_delivery_address').length > 0) {
+                formData.append('is_primary', $('#save_as_primary_delivery_address').prop('checked'));
             }
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('checkout/save/guest/delivery/address') }}' : '{{ url('checkout/save/account/delivery/address') }}';
             $.ajax({
                 method: 'post',
-                url: '{{ url('checkout/save/delivery/address') }}',
+                url: url,
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -816,10 +955,13 @@
                     $('#delivery_address_form_submit_button').removeClass('disabled');
                     $('#delivery_address_form_submit_button_text').removeClass('sr-only');
                     $('#delivery_address_form_submit_button_processing').addClass('sr-only');
-                    $('#delivery_address_form_container').find('#id').remove();
+                    clearDeliveryAddressForm();
                     $('#delivery_address_form_container').hide(1000);
-                    loadDeliveryAddresses();
-
+                    if (isGuest) {
+                        loadDeliveryAddressForGuest();
+                    } else {
+                        loadDeliveryAddressesForAccount();
+                    }
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -843,24 +985,21 @@
 
 
 
-        $(document).on('click', '#cancel_change_address', function () {
-            $('#delivery_address_form_container').find('#id').remove();
-            $('#delivery_address_form').find('.invalid-feedback').remove();
-            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
-            $('#save_as_primary_address').parent().remove();
-            $('#delivery_address_form')[0].reset();
+        $(document).on('click', '#cancel_change_delivery_address_for_account', function () {
+            clearDeliveryAddressForm();
             $('#delivery_address_form_container').hide(1000);
-            loadDeliveryAddress();
+            loadDeliveryAddressForAccount();
         });
 
         $(document).on('click', '#delivery_address_form_cancel_button', function () {
-            $('#delivery_address_form_container').find('#id').remove();
-            $('#delivery_address_form').find('.invalid-feedback').remove();
-            $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
-            $('#save_as_primary_address').parent().remove();
-            $('#delivery_address_form')[0].reset();
+            clearDeliveryAddressForm();
             $('#delivery_address_form_container').hide(1000);
-            loadDeliveryAddress();
+            let isGuest = '{{ $isGuest }}';
+            if (isGuest) {
+                loadDeliveryAddressForGuest();
+            } else {
+                loadDeliveryAddressesForAccount();
+            }
         });
 
         //////////////////////////////////////////////////////Shipping Section End//////////////////////////////////////////////////////////
@@ -898,7 +1037,7 @@
 
 
         function clearBillingAddressForm() {
-            $('#billing_address_form').find('#id').remove();
+            $('#billing_address_form').find('#id_for_billing').remove();
             $('#country_id_for_billing option').removeAttr('selected');
             $('#state_field_holder_for_billing').empty();
             $('#billing_address_form').find('.invalid-feedback').remove();
@@ -968,7 +1107,7 @@
                     $('#billing_address_container').empty();
                     clearBillingAddressForm();
 
-                    $('#billing_address_form').append('<input type="hidden" name="id" id="id" value="' + result.payload.id + '">');
+                    $('#billing_address_form').append('<input type="hidden" name="id" id="id_for_billing" value="' + result.payload.id + '">');
                     $('#first_name_for_billing').val(result.payload.first_name);
                     $('#last_name_for_billing').val(result.payload.last_name);
                     $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
@@ -995,18 +1134,19 @@
                             } else {
                                 $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + result.payload.state + '"><label for="state_for_billing">State</label></div>');
                             }
+                            $('#city_for_billing').val(result.payload.city);
+                            $('#postal_code_for_billing').val(result.payload.postal_code);
+                            $('#address_line_1_for_billing').val(result.payload.address_line_1);
+                            $('#address_line_2_for_billing').val(result.payload.address_line_2);
+                            $('#phone_for_billing').val(result.payload.phone);
+                            $('#email_for_billing').val(result.payload.email);
+                            $('#billing_address_form_container').show(1000);
                         },
                         error: function (xhr) {
                             console.log(xhr);
                         }
                     });
-                    $('#city_for_billing').val(result.payload.city);
-                    $('#postal_code_for_billing').val(result.payload.postal_code);
-                    $('#address_line_1_for_billing').val(result.payload.address_line_1);
-                    $('#address_line_2_for_billing').val(result.payload.address_line_2);
-                    $('#phone_for_billing').val(result.payload.phone);
-                    $('#email_for_billing').val(result.payload.email);
-                    $('#billing_address_form_container').show(1000);
+
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -1056,18 +1196,19 @@
                             } else {
                                 $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + result.payload.state + '"><label for="state_for_billing">State</label></div>');
                             }
+                            $('#city_for_billing').val(result.payload.city);
+                            $('#postal_code_for_billing').val(result.payload.postal_code);
+                            $('#address_line_1_for_billing').val(result.payload.address_line_1);
+                            $('#address_line_2_for_billing').val(result.payload.address_line_2);
+                            $('#phone_for_billing').val(result.payload.phone);
+                            $('#email_for_billing').val(result.payload.email);
+                            $('#billing_address_form_container').show(1000);
                         },
                         error: function (xhr) {
                             console.log(xhr);
                         }
                     });
-                    $('#city_for_billing').val(result.payload.city);
-                    $('#postal_code_for_billing').val(result.payload.postal_code);
-                    $('#address_line_1_for_billing').val(result.payload.address_line_1);
-                    $('#address_line_2_for_billing').val(result.payload.address_line_2);
-                    $('#phone_for_billing').val(result.payload.phone);
-                    $('#email_for_billing').val(result.payload.email);
-                    $('#billing_address_form_container').show(1000);
+
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -1082,7 +1223,7 @@
             $('#billing_address_container').empty();
             clearBillingAddressForm();
 
-            $('#billing_address_form').append('<input type="hidden" name="id" id="id" value="' + $(this).data('id') + '">');
+            $('#billing_address_form').append('<input type="hidden" name="id" id="id_for_billing" value="' + $(this).data('id') + '">');
 
             let userCountry = '{{ $userCountry }}';
             let userState = '{{ $userState }}';
@@ -1111,6 +1252,7 @@
                     } else {
                         $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
                     }
+                    $('#billing_address_form_container').show(1000);
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -1118,7 +1260,7 @@
             });
 
 
-            $('#billing_address_form_container').show(1000);
+
         });
 
         $(document).on('click', '#change_billing_address_for_guest', function () {
@@ -1152,6 +1294,7 @@
                     } else {
                         $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
                     }
+                    $('#billing_address_form_container').show(1000);
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -1159,7 +1302,7 @@
             });
 
 
-            $('#billing_address_form_container').show(1000);
+
         });
 
 
@@ -1244,10 +1387,12 @@
 
             let isGuest = '{{ $isGuest }}';
             loadCheckoutItems();
-            loadDeliveryAddress();
+
             if (isGuest) {
+                loadDeliveryAddressForGuest();
                 loadBillingAddressForGuest();
             } else {
+                loadDeliveryAddressForAccount();
                 loadBillingAddressForAccount();
             }
 
