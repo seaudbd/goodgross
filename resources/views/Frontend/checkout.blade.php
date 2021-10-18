@@ -277,8 +277,8 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-check mb-2">
-                                        <input type="radio" class="form-check-input payment_method" id="payment_method_paypal" name="payment_method" value="PayPal">
-                                        <label class="form-check-label font-italic" for="payment_method_paypal" style="font-weight: 600;">
+                                        <input type="radio" class="form-check-input payment_option" id="payment_option_paypal" name="payment_option" value="PayPal">
+                                        <label class="form-check-label font-italic" for="payment_option_paypal" style="font-weight: 600;">
                                             PayPal
                                         </label>
                                     </div>
@@ -293,8 +293,8 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-check mb-2">
-                                        <input type="radio" class="form-check-input payment_method" id="payment_method_card" name="payment_method" value="Card">
-                                        <label class="form-check-label font-italic" for="payment_method_card" style="font-weight: 600;">
+                                        <input type="radio" class="form-check-input payment_option" id="payment_option_card" name="payment_option" value="Card">
+                                        <label class="form-check-label font-italic" for="payment_option_card" style="font-weight: 600;">
                                             Debit or Credit Card
                                         </label>
                                     </div>
@@ -306,63 +306,70 @@
                             </div>
 
 
-                            <div class="mt-4" id="payment_method_card_details">
+                            <div class="mt-4" id="card_form_container">
 
-                                <div class="row mb-4">
-                                    <div class="col-9 pe-0">
-                                        <div class="form-floating">
-                                            <input autocomplete="off" class="form-control" type="text" name="card_number" id="card_number" placeholder="Card Number">
-                                            <label for="card_number">Card Number</label>
+                                <form id="card_form">
+                                    <div class="row mb-4">
+                                        <div class="col-9 pe-0">
+                                            <div class="form-floating">
+                                                <input autocomplete="off" class="form-control" type="text" name="card_number" id="card_number" placeholder="Card Number">
+                                                <label for="card_number">Card Number</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-3 ps-0">
+                                            <div class="form-floating">
+                                                <input type="text" autocomplete="off" class="form-control" size="4" name="card_cvc" id="card_cvc" placeholder="CVC">
+                                                <label for="card_cvc">CVC</label>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-3 ps-0">
-                                        <div class="form-floating">
-                                            <input type="text" autocomplete="off" class="form-control" size="4" name="card_cvc" id="card_cvc" placeholder="CVC">
-                                            <label for="card_cvc">CVC</label>
+
+
+
+                                    <div class="input-group mb-4">
+                                        <span class="input-group-text" style="font-size: small; color: #615f75; width: 25%;">Expiry Date</span>
+                                        <div class="form-floating" style="width: 38%;">
+                                            <select class="form-select" name="expiry_month" id="expiry_month">
+                                                <option value="">Select Month</option>
+                                                <option value="01">January</option>
+                                                <option value="02">February</option>
+                                                <option value="03">March</option>
+                                                <option value="04">April</option>
+                                                <option value="05">May</option>
+                                                <option value="06">June</option>
+                                                <option value="07">July</option>
+                                                <option value="08">August</option>
+                                                <option value="09">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+                                            <label for="expiry_month">Month</label>
+                                        </div>
+                                        <div class="form-floating" style="width: 37%;">
+                                            <select class="form-select" name="expiry_year" id="expiry_year">
+                                                <option value="">Select Year</option>
+                                                @for($i = date('Y'); $i <= date('Y') + 10; $i++)
+                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                @endfor
+                                            </select>
+                                            <label for="expiry_year">Year</label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col d-grid">
+                                            <button type="submit" class="mod_button_1" id="card_form_submit_button">
+                                                <span id="card_form_submit_button_text">Done</span>
+                                                <span id="card_form_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
+                                            </button>
+                                        </div>
+                                        <div class="col d-grid">
+                                            <button type="button" class="mod_button_2" id="card_form_cancel_button">Cancel</button>
                                         </div>
                                     </div>
-                                </div>
-
-
-
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text" style="font-size: small; color: #615f75; width: 25%;">Expiry Date</span>
-                                    <div class="form-floating" style="width: 38%;">
-                                        <select class="form-select" name="expiry_month" id="expiry_month">
-                                            <option value="">Select Month</option>
-                                            <option value="01">January</option>
-                                            <option value="02">February</option>
-                                            <option value="03">March</option>
-                                            <option value="04">April</option>
-                                            <option value="05">May</option>
-                                            <option value="06">June</option>
-                                            <option value="07">July</option>
-                                            <option value="08">August</option>
-                                            <option value="09">September</option>
-                                            <option value="10">October</option>
-                                            <option value="11">November</option>
-                                            <option value="12">December</option>
-                                        </select>
-                                        <label for="expiry_month">Month</label>
-                                    </div>
-                                    <div class="form-floating" style="width: 37%;">
-                                        <select class="form-select" name="expiry_year" id="expiry_year">
-                                            <option value="">Select Year</option>
-                                            @for($i = date('Y'); $i <= date('Y') + 10; $i++)
-                                                <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
-                                        </select>
-                                        <label for="expiry_year">Year</label>
-                                    </div>
-
-                                </div>
-
-                                <div class="col d-grid">
-                                    <button type="button" class="btn primary_btn_default" id="deliver_address_for_checkout_form_button">
-                                        <span id="deliver_address_for_checkout_form_button_text">Done</span>
-                                        <span id="deliver_address_for_checkout_form_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
-                                    </button>
-                                </div>
+                                </form>
 
 
                             </div>
@@ -505,9 +512,14 @@
                                     <div class="mt-1">Estimated Tax: <b>US $0.00</b></div>
                                     <hr style="color: #a5d4ba;">
                                     <div class="mb-3">Grand Total : <b>US $` + subtotal.toFixed(2) + `</b></div>
-                                    <div class="mb-3 d-grid gap-3">
-                                        <button class="btn primary_btn_default" id="place_order">Place Order</button>
-                                        <button class="btn btn-outline-primary" style="background-color: #27a0ff1a; border-color: #27a0ff1a;">Continue Shopping</button>
+                                    <hr style="color: #a5d4ba;">
+                                    <div class="text-danger text-center small" id="payment_option_message">Select a Payment Option</div>
+                                    <div class="my-4 d-grid gap-3">
+                                        <button class="btn primary_btn_default" id="place_order_button" disabled>
+                                            <span id="place_order_button_text">Confirm to Place Order</span>
+                                            <span id="place_order_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
+                                        </button>
+                                        <button class="btn btn-outline-info">Continue Shopping</button>
                                     </div>
                                 </div>
                             </div>
@@ -1401,29 +1413,24 @@
             $('#delivery_address_form_container').hide();
             $('#billing_address_form_container').hide();
 
-            $('#payment_method_card_details').hide();
-            $('#card_number').attr('disabled', true);
-            $('#card_cvc').attr('disabled', true);
-            $('#expiry_month').attr('disabled', true);
-            $('#expiry_year').attr('disabled', true);
+            $('#card_form_container').hide();
+
 
 
         })
 
 
-        $(document).on('click', '.payment_method', function () {
-            $('#card_number').val('').attr('disabled', true);
-            $('#card_cvc').val('').attr('disabled', true);
-            $('#expiry_month').val('').attr('disabled', true);
-            $('#expiry_year').val('').attr('disabled', true);
+        $(document).on('click', '.payment_option', function () {
             if ($(this).val() === 'Card') {
-                $('#card_number').val('').removeAttr('disabled');
-                $('#card_cvc').val('').removeAttr('disabled');
-                $('#expiry_month').val('').removeAttr('disabled');
-                $('#expiry_year').val('').removeAttr('disabled');
-                $('#payment_method_card_details').show(1000);
-            } else {
-                $('#payment_method_card_details').hide(1000);
+                $('#payment_option_message').removeClass('text-info').addClass('text-danger').text('Enter Your Card Details');
+                $('#place_order_button_text').text('Confirm to Place Order');
+                $('#place_order_button').attr('disabled', true);
+                $('#card_form_container').show(1000);
+            } else if ($(this).val() === 'PayPal') {
+                $('#payment_option_message').removeClass('text-danger').addClass('text-info').text('You will Finish Checkout with PayPal');
+                $('#place_order_button_text').text('Pay with PayPal');
+                $('#place_order_button').removeAttr('disabled');
+                $('#card_form_container').hide(1000);
             }
             return true;
         });

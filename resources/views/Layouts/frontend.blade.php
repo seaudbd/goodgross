@@ -175,6 +175,12 @@
             border-radius: 2px;
         }
 
+        .primary_btn_default:disabled {
+            background-color: #626f68;
+            color: #ffffff;
+            border-radius: 2px;
+        }
+
         .secondary_btn_default {
             background-color: #e9f5f2;
             color: #ffffff;
