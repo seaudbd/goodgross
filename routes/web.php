@@ -53,11 +53,6 @@ Route::get('clear', function() {
 });
 
 
-
-Route::get('regenerate/csrf/token', function() {
-    return response()->json(csrf_token());
-});
-
 Route::get('check/account/login/status', [SignInController::class, 'checkAccountLoginStatus']);
 Route::get('is/shipping/address/available', [CheckoutController::class, 'isShippingAddressAvailable']);
 Route::get('is/guest/delivery/address/exist', [CheckoutController::class, 'isGuestDeliveryAddressExist']);
@@ -72,8 +67,8 @@ Route::get('category/{category_id}', [ProductController::class, 'loadCategorized
 Route::get('category/get/categorized/products', [ProductController::class, 'getCategorizedProducts']);
 Route::get('category/get/filter/items', [ProductController::class, 'getFilterItems']);
 Route::get('product/{product_id}', [ProductController::class, 'loadProduct']);
-Route::post('product/add/to/cart', [ProductController::class, 'addToCart']);
-Route::post('product/add/to/watch', [ProductController::class, 'addToWatch']);
+Route::get('product/add/to/cart', [ProductController::class, 'addToCart']);
+Route::get('product/add/to/watch', [ProductController::class, 'addToWatch']);
 Route::post('product/add/to/session', [ProductController::class, 'addWholesaleItemToSession']);
 
 
@@ -111,6 +106,13 @@ Route::get('checkout/get/guest/billing/address', [CheckoutController::class, 'ge
 Route::get('checkout/get/account/billing/address/by/id', [CheckoutController::class, 'getAccountBillingAddressById']);
 Route::post('checkout/save/billing/address/for/account', [CheckoutController::class, 'saveBillingAddressForAccount']);
 Route::post('checkout/save/billing/address/for/guest', [CheckoutController::class, 'saveBillingAddressForGuest']);
+Route::get('checkout/delete/card/from/account', [CheckoutController::class, 'deleteCardFromAccount']);
+
+
+Route::get('checkout/get/account/cards', [CheckoutController::class, 'getAccountCards']);
+Route::get('checkout/get/guest/cards', [CheckoutController::class, 'getGuestCards']);
+Route::post('checkout/save/card/for/account', [CheckoutController::class, 'saveCardForAccount']);
+Route::post('checkout/save/card/for/guest', [CheckoutController::class, 'saveCardForGuest']);
 
 //Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
 Route::post('checkout', [CheckoutController::class, 'processCheckout']);

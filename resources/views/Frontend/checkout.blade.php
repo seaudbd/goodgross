@@ -39,6 +39,15 @@
 
 
                 <div class="row mt-4">
+
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-4">
+                        <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Order Review</div>
+                        <div id="checkout_items_container">
+
+                        </div>
+                    </div>
+
+
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-4">
                         <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Shipping To</div>
                         <div class="card border-0 shadow-sm">
@@ -146,6 +155,8 @@
 
                         </div>
 
+                        <div class="text-secondary fw-bold p-2 mt-4" style="background-color: #efefef;">Shipping Method</div>
+
 
 
 
@@ -252,26 +263,14 @@
                                     </form>
                                 </div>
                             </div>
-
-
                         </div>
-
-
-
-
-
-
-
-
-
-
-
                     </div>
+
+
+
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-4">
+
                         <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Payment</div>
-
-
-
 
                         <div class="border mb-3 py-3 px-3">
                             <div class="row">
@@ -305,21 +304,22 @@
                                 </div>
                             </div>
 
+                            <div class="mt-4" id="cards_container"></div>
 
                             <div class="mt-4" id="card_form_container">
 
                                 <form id="card_form">
                                     <div class="row mb-4">
-                                        <div class="col-9 pe-0">
+                                        <div class="col-8 pe-0">
                                             <div class="form-floating">
                                                 <input autocomplete="off" class="form-control" type="text" name="card_number" id="card_number" placeholder="Card Number">
                                                 <label for="card_number">Card Number</label>
                                             </div>
                                         </div>
-                                        <div class="col-3 ps-0">
+                                        <div class="col-4 ps-0">
                                             <div class="form-floating">
-                                                <input type="text" autocomplete="off" class="form-control" size="4" name="card_cvc" id="card_cvc" placeholder="CVC">
-                                                <label for="card_cvc">CVC</label>
+                                                <input type="text" autocomplete="off" class="form-control" size="4" name="security_code" id="security_code" placeholder="Security Code">
+                                                <label for="security_code">Security Code</label>
                                             </div>
                                         </div>
                                     </div>
@@ -327,8 +327,8 @@
 
 
                                     <div class="input-group mb-4">
-                                        <span class="input-group-text" style="font-size: small; color: #615f75; width: 25%;">Expiry Date</span>
-                                        <div class="form-floating" style="width: 38%;">
+                                        <span class="input-group-text" style="font-size: small; color: #615f75; width: 20%;">Expiry Date</span>
+                                        <div class="form-floating" style="width: 40%;">
                                             <select class="form-select" name="expiry_month" id="expiry_month">
                                                 <option value="">Select Month</option>
                                                 <option value="01">January</option>
@@ -346,7 +346,7 @@
                                             </select>
                                             <label for="expiry_month">Month</label>
                                         </div>
-                                        <div class="form-floating" style="width: 37%;">
+                                        <div class="form-floating" style="width: 40%;">
                                             <select class="form-select" name="expiry_year" id="expiry_year">
                                                 <option value="">Select Year</option>
                                                 @for($i = date('Y'); $i <= date('Y') + 10; $i++)
@@ -370,28 +370,9 @@
                                         </div>
                                     </div>
                                 </form>
-
-
                             </div>
-
-
-
-
-
-
                         </div>
 
-
-                        <div class="text-secondary fw-bold p-2 mt-4" style="background-color: #efefef;">Shipping Method</div>
-
-
-
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-4">
-                        <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Order Review</div>
-                        <div id="checkout_items_container">
-
-                        </div>
 
                         <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Order Summary</div>
                         <div id="order_summary_container">
@@ -1312,9 +1293,6 @@
                     console.log(xhr);
                 }
             });
-
-
-
         });
 
 
@@ -1408,32 +1386,230 @@
                 loadBillingAddressForAccount();
             }
 
-
-
             $('#delivery_address_form_container').hide();
             $('#billing_address_form_container').hide();
-
+            $('#cards_container').hide();
             $('#card_form_container').hide();
+        });
 
 
+        $(document).on('click', '.delete_card_from_account', function () {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/delete/card/from/account') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    loadCardsForAccount();
 
-        })
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        function loadCardsForAccount() {
+            $('#cards_container').hide();
+            $('#card_form_container').hide();
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/account/cards') }}',
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    if (result.payload.length > 0) {
+                        $('#cards_container').empty();
+                        let cardBrandImagePath;
+                        $.each(result.payload, function (key, card) {
+                            cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                            console.log(cardBrandImagePath);
+                            $('#cards_container').append(`
+                                <div class="card">
+                                    <div class="card-body small">
+                                        <div class="row"><div class="col-8"><div>` + card.card_brand + ` Ending in ` + card.card_number.substr(-4) + `</div><div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div><div class="mt-3"><a href="javascript:void(0)" id="edit_card_for_account" data-id="` + card.id + `">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="` + card.id + `">Delete</a></div></div><div class="col-4"><img src="` + cardBrandImagePath + `" class="img-fluid"></div></div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                        $('#cards_container').show(1000);
+                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card');
+                        $('#place_order_button_text').text('Place Order');
+                        $('#place_order_button').removeAttr('disabled');
+                    } else {
+                        $('#payment_option_message').removeClass('text-success').addClass('text-danger').text('Enter Your Card Details');
+                        $('#place_order_button_text').text('Confirm to Place Order');
+                        $('#place_order_button').attr('disabled', true);
+                        $('#card_form_container').show(1000);
+                    }
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        }
+
+        function loadCardsForGuest() {
+            $('#cards_container').hide();
+            $('#card_form_container').hide();
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/cards') }}',
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    if (result.payload.length > 0) {
+
+                        $('#cards_container').empty();
+                        let cardBrandImagePath;
+                        $.each(result.payload, function (key, card) {
+                            cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                            console.log(cardBrandImagePath);
+                            $('#cards_container').append(`
+                                <div class="card">
+                                    <div class="card-body small">
+                                        <div class="row"><div class="col-8"><div>` + card.card_brand + ` Ending in ` + card.card_number.substr(-4) + `</div><div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div><div class="mt-3"><a href="javascript:void(0)" id="edit_card_for_account" data-id="` + card.id + `">Edit</a> | <a href="javascript:void(0)" id="delete_card_for_account" data-id="` + card.id + `">Delete</a></div></div><div class="col-4"><img src="` + cardBrandImagePath + `" class="img-fluid"></div></div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                        $('#cards_container').show(1000);
+                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card');
+                        $('#place_order_button_text').text('Place Order');
+                        $('#place_order_button').removeAttr('disabled');
+
+                    } else {
+                        $('#payment_option_message').removeClass('text-success').addClass('text-danger').text('Enter Your Card Details');
+                        $('#place_order_button_text').text('Confirm to Place Order');
+                        $('#place_order_button').attr('disabled', true);
+                        $('#card_form_container').show(1000);
+                    }
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        }
 
 
         $(document).on('click', '.payment_option', function () {
             if ($(this).val() === 'Card') {
-                $('#payment_option_message').removeClass('text-info').addClass('text-danger').text('Enter Your Card Details');
-                $('#place_order_button_text').text('Confirm to Place Order');
-                $('#place_order_button').attr('disabled', true);
-                $('#card_form_container').show(1000);
+
+                let isGuest = '{{ $isGuest }}';
+                if (isGuest) {
+                    loadCardsForGuest();
+                } else {
+                    loadCardsForAccount();
+                }
+
             } else if ($(this).val() === 'PayPal') {
-                $('#payment_option_message').removeClass('text-danger').addClass('text-info').text('You will Finish Checkout with PayPal');
-                $('#place_order_button_text').text('Pay with PayPal');
+                $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with PayPal');
+                $('#place_order_button_text').text('Place Order');
                 $('#place_order_button').removeAttr('disabled');
+                $('#cards_container').hide(1000);
                 $('#card_form_container').hide(1000);
             }
             return true;
         });
+
+
+        $(document).on('submit', '#card_form', function (event) {
+            event.preventDefault();
+
+            $('#card_form').find('.invalid-feedback').remove();
+            $('#card_form').find('.is-invalid').removeClass('is-invalid');
+
+            $('#card_form_submit_button').addClass('disabled');
+            $('#card_form_submit_button_text').addClass('sr-only');
+            $('#card_form_submit_button_processing').removeClass('sr-only');
+            let formData = new FormData(this);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('checkout/save/card/for/guest') }}' : '{{ url('checkout/save/card/for/account') }}';
+            $.ajax({
+                method: 'post',
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                cache: false,
+                global: false,
+                success: function (result) {
+                    console.log(result);
+                    $('#card_form_submit_button').removeClass('disabled');
+                    $('#card_form_submit_button_text').removeClass('sr-only');
+                    $('#card_form_submit_button_processing').addClass('sr-only');
+
+                    if (result.success === true) {
+                        if (isGuest) {
+                            loadCardsForGuest();
+                        } else {
+                            loadCardsForAccount();
+                        }
+                    } else {
+                        $('#card_form').prepend('<div class="text-danger small invalid-feedback d-block mb-4">' + result.message + '</div>');
+                    }
+
+
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                    $('#card_form_submit_button').removeClass('disabled');
+                    $('#card_form_submit_button_text').removeClass('sr-only');
+                    $('#card_form_submit_button_processing').addClass('sr-only');
+                    if (xhr.responseJSON.hasOwnProperty('errors')) {
+
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            if (key === 'expiry_month' || key === 'expiry_year') {
+                                if (key === 'expiry_month') {
+                                    $('#' + key).parent().parent().after('<div class="invalid-feedback expiry_month_error_message d-block mb-4"></div>');
+                                    $('#' + key).addClass('is-invalid');
+                                    $.each(value, function (k, v) {
+                                        $('#' + key).parent().parent().parent().find('.expiry_month_error_message').append('<div>' + v + '</div>');
+                                    });
+                                }
+                                if (key === 'expiry_year') {
+                                    $('#' + key).parent().parent().after('<div class="invalid-feedback expiry_year_error_message d-block mb-4"></div>');
+                                    $('#' + key).addClass('is-invalid');
+                                    $.each(value, function (k, v) {
+                                        $('#' + key).parent().parent().parent().find('.expiry_year_error_message').append('<div>' + v + '</div>');
+                                    });
+                                }
+                            } else {
+                                $('#' + key).after('<div class="invalid-feedback"></div>');
+                                $('#' + key).addClass('is-invalid');
+                                $.each(value, function (k, v) {
+                                    $('#' + key).parent().find('.invalid-feedback').append('<div>' + v + '</div>');
+                                });
+                            }
+
+                        })
+                    }
+                }
+            });
+
+        });
+
+        $(document).on('click', '#card_form_cancel_button', function () {
+            $('#cards_container').empty().hide();
+            $('#card_form').find('.invalid-feedback').remove();
+            $('#card_form').find('.is-invalid').removeClass('is-invalid');
+            $('#card_form_container').hide(1000);
+            $('.payment_option').prop('checked', false);
+            $('#payment_option_message').removeClass('text-success').addClass('text-danger').text('Select a Payment Option');
+            $('#place_order_button_text').text('Confirm to Place Order');
+            $('#place_order_button').attr('disabled', true);
+        });
+
+
+
 
         $(document).on('change', '#create_an_account', function () {
             if ($(this).is(':checked') === true) {

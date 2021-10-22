@@ -635,54 +635,34 @@
                     $('#sign_in_form_submit_processing').addClass('sr-only');
                     if (authenticationResult.success === true) {
                         $('#sign_in_modal .btn-close').click();
-
-                        $.ajax({
-                            method: 'get',
-                            url: '{{ url('regenerate/csrf/token') }}',
-                            global: false,
-                            success: function (token) {
-                                console.log(token);
-
-                                if (whichAction === 'buy_it_now') {
-
-                                    let buyItNowFormData = new FormData();
-                                    buyItNowFormData.append('_token', token);
-                                    buyItNowFormData.append('product_id', '{{ $product->id }}');
-                                    buyItNowFormData.append('quantity', parseInt($('#quantity').text()));
-
-
+                        if (whichAction === 'buy_it_now') {
+                            $.ajax({
+                                method: 'get',
+                                url: '{{ url('product/add/to/cart') }}',
+                                data: {
+                                    product_id: '{{ $product->id }}',
+                                    quantity: parseInt($('#quantity').text())
+                                },
+                                global: false,
+                                success: function (cartResult) {
+                                    console.log(cartResult);
+                                    $('#cart_counter').text(cartResult.data);
+                                    $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
                                     $.ajax({
-                                        method: 'post',
-                                        url: '{{ url('product/add/to/cart') }}',
-                                        data: buyItNowFormData,
-                                        processData: false,
-                                        contentType: false,
-                                        global: false,
-                                        success: function (cartResult) {
-                                            console.log(cartResult);
-                                            $('#cart_counter').text(cartResult.data);
-                                            $('#add_to_cart').text('View Cart').attr('id', 'view_cart');
+                                        method: 'get',
+                                        url: '{{ url('cart/copy/items/to/checkout') }}',
+                                        success: function (checkoutResult) {
+                                            console.log(checkoutResult);
                                             $.ajax({
                                                 method: 'get',
-                                                url: '{{ url('cart/copy/items/to/checkout') }}',
-                                                success: function (checkoutResult) {
-                                                    console.log(checkoutResult);
-                                                    $.ajax({
-                                                        method: 'get',
-                                                        url: '{{ url('is/shipping/address/available') }}',
-                                                        success: function (shippingAddressResult) {
-                                                            console.log(shippingAddressResult);
-                                                            if (shippingAddressResult.payload.length > 0) {
-                                                                location = '{{ url('checkout') }}';
-                                                            } else {
-                                                                location = '{{ url('delivery/address') }}';
-                                                            }
-
-                                                        },
-                                                        error: function (xhr) {
-                                                            console.log(xhr)
-                                                        }
-                                                    });
+                                                url: '{{ url('is/shipping/address/available') }}',
+                                                success: function (shippingAddressResult) {
+                                                    console.log(shippingAddressResult);
+                                                    if (shippingAddressResult.payload.length > 0) {
+                                                        location = '{{ url('checkout') }}';
+                                                    } else {
+                                                        location = '{{ url('delivery/address') }}';
+                                                    }
 
                                                 },
                                                 error: function (xhr) {
@@ -695,48 +675,43 @@
                                             console.log(xhr)
                                         }
                                     });
-                                } else {
-                                    let addToWatchFormData = new FormData();
-                                    addToWatchFormData.append('_token', token);
-                                    addToWatchFormData.append('product_id', '{{ $product->id }}');
-                                    $.ajax({
-                                        method: 'post',
-                                        url: '{{ url('product/add/to/watch') }}',
-                                        data: addToWatchFormData,
-                                        processData: false,
-                                        contentType: false,
-                                        success: function (response) {
-                                            console.log(response);
 
-
-                                            $('#sign_in_modal .btn-close').click();
-                                            $('#add_to_watch').text('View Watch List').attr('id', 'view_watch_list');
-                                            $.toast({
-                                                text : result.message,
-                                                showHideTransition : 'slide',
-                                                bgColor : 'green',
-                                                textColor : '#eee',
-                                                allowToastClose : true,
-                                                hideAfter : 5000,
-                                                stack : 5,
-                                                textAlign : 'left',
-                                                position : 'bottom-left'
-                                            });
-                                            location.reload();
-                                        },
-                                        error: function (xhr) {
-                                            console.log(xhr)
-                                        }
-                                    });
+                                },
+                                error: function (xhr) {
+                                    console.log(xhr)
                                 }
+                            });
+                        } else {
+                            $.ajax({
+                                method: 'get',
+                                url: '{{ url('product/add/to/watch') }}',
+                                data: {
+                                    product_id: '{{ $product->id }}'
+                                },
+                                success: function (response) {
+                                    console.log(response);
+                                    $('#sign_in_modal .btn-close').click();
+                                    $('#add_to_watch').text('View Watch List').attr('id', 'view_watch_list');
+                                    $.toast({
+                                        text : result.message,
+                                        showHideTransition : 'slide',
+                                        bgColor : 'green',
+                                        textColor : '#eee',
+                                        allowToastClose : true,
+                                        hideAfter : 5000,
+                                        stack : 5,
+                                        textAlign : 'left',
+                                        position : 'bottom-left'
+                                    });
+                                    location.reload();
+                                },
+                                error: function (xhr) {
+                                    console.log(xhr)
+                                }
+                            });
+                        }
 
 
-
-                            },
-                            error: function (xhr) {
-                                console.log(xhr)
-                            }
-                        });
 
                     } else {
                         if (authenticationResult.message === 'Pending Account') {
@@ -816,16 +791,13 @@
 
 
         $(document).on('click', '#add_to_cart', function () {
-            let formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('product_id', '{{ $product->id }}');
-            formData.append('quantity', parseInt($('#quantity').text()));
             $.ajax({
-                method: 'post',
+                method: 'get',
                 url: '{{ url('product/add/to/cart') }}',
-                data: formData,
-                processData: false,
-                contentType: false,
+                data: {
+                    product_id: '{{ $product->id }}',
+                    quantity: parseInt($('#quantity').text())
+                },
                 success: function (result) {
                     console.log(result);
                     $('#cart_counter').text(result.data);
@@ -850,29 +822,21 @@
         });
 
         $(document).on('click', '#buy_it_now', function () {
-
-
             $.ajax({
                 method: 'get',
                 url: '{{ url('check/account/login/status') }}',
                 success: function (loginStatusResult) {
                     console.log(loginStatusResult);
                     if (loginStatusResult.account_login_status === true) {
-
-                        let formData = new FormData();
-                        formData.append('_token', '{{ csrf_token() }}');
-                        formData.append('product_id', '{{ $product->id }}');
-                        formData.append('quantity', parseInt($('#quantity').text()));
                         $.ajax({
-                            method: 'post',
+                            method: 'get',
                             url: '{{ url('product/add/to/cart') }}',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
+                            data: {
+                                product_id: '{{ $product->id }}',
+                                quantity: parseInt($('#quantity').text())
+                            },
                             success: function (cartResult) {
                                 console.log(cartResult);
-
-
                                 $.ajax({
                                     method: 'get',
                                     url: '{{ url('cart/copy/items/to/checkout') }}',
@@ -921,16 +885,14 @@
 
         $(document).on('click', '#continue_as_guest', function () {
             $('#sign_in_modal .btn-close').click();
-            let formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('product_id', '{{ $product->id }}');
-            formData.append('quantity', parseInt($('#quantity').text()));
+
             $.ajax({
-                method: 'post',
+                method: 'get',
                 url: '{{ url('product/add/to/cart') }}',
-                data: formData,
-                processData: false,
-                contentType: false,
+                data: {
+                    product_id: '{{ $product->id }}',
+                    quantity: parseInt($('#quantity').text())
+                },
                 success: function (cartResult) {
                     console.log(cartResult);
                     $.ajax({
@@ -938,7 +900,6 @@
                         url: '{{ url('cart/copy/items/to/checkout') }}',
                         success: function (checkoutResult) {
                             console.log(checkoutResult);
-
                             $.ajax({
                                 method: 'get',
                                 url: '{{ url('is/guest/delivery/address/exist') }}',
@@ -968,28 +929,20 @@
         });
 
         $(document).on('click', '#add_to_watch', function () {
-
-
-
             $.ajax({
                 method: 'get',
                 url: '{{ url('check/account/login/status') }}',
                 success: function (result) {
                     console.log(result);
                     if (result.account_login_status === true) {
-
-                        let formData = new FormData();
-                        formData.append('_token', '{{ csrf_token() }}');
-                        formData.append('product_id', '{{ $product->id }}');
                         $.ajax({
-                            method: 'post',
+                            method: 'get',
                             url: '{{ url('product/add/to/watch') }}',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
+                            data: {
+                                product_id: '{{ $product->id }}'
+                            },
                             success: function (result) {
                                 console.log(result);
-
                                 $('#add_to_watch').text('View Watch List').attr('id', 'view_watch_list');
                                 $.toast({
                                     text : result.message,
@@ -1022,7 +975,7 @@
 
 
 
-        $(document).on('click', '#view_cart', function (event) {
+        $(document).on('click', '#view_cart', function () {
             location = '{{ url('cart') }}';
         });
 

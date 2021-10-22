@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Frontend\CardRequest;
 use App\Http\Requests\Frontend\CheckoutRequest;
 
 
 use App\Http\Requests\Frontend\DeliveryAddressRequest;
 use App\Models\Account;
 use App\Models\AccountBilling;
+use App\Models\AccountCard;
 use App\Models\AccountShipping;
 use App\Models\Country;
 use App\Models\State;
@@ -42,6 +44,7 @@ use PayPalCheckoutSdk\Core\SandboxEnvironment;
 
 use Stevebauman\Location\Facades\Location;
 
+use Stripe\BaseStripeClient;
 use \Stripe\StripeClient;
 use \Exception;
 use \Stripe\Exception\CardException;
@@ -223,6 +226,69 @@ class CheckoutController extends Controller
         Session::forget('billing_address_for_guest');
         Session::put('billing_address_for_guest', $billingAddress);
         return response()->json(['success' => true, 'message' => 'Billing Address Saved Successfully', 'payload' => null]);
+    }
+
+    public function getAccountCards(): JsonResponse
+    {
+        return response()->json(['success' => true, 'message' => 'Account Cards Fetched Successfully', 'payload' => AccountCard::where('account_id', auth()->user()->account->id)->get()]);
+    }
+
+    public function getGuestCards(): JsonResponse
+    {
+        return response()->json(['success' => true, 'message' => 'Guest Cards Fetched Successfully', 'payload' => Session::get('cards_for_guest')]);
+    }
+
+    public function saveCardForAccount(CardRequest $request): JsonResponse
+    {
+
+        $stripeConf = Config::get('stripe');
+        $stripe = new StripeClient(
+            $stripeConf['secret']
+        );
+
+        try {
+            $token = $stripe->tokens->create([
+                'card' => [
+                    'number' => $request->card_number,
+                    'exp_month' => $request->expiry_month,
+                    'exp_year' => $request->expiry_year,
+                    'cvc' => $request->security_code,
+                ],
+            ]);
+            if (!isset($token->id)) {
+                return response()->json(['success' => false, 'message' => 'Token Generation Failed', 'payload' => null]);
+            }
+            //return response()->json($token);
+            $accountCard = new AccountCard();
+            $accountCard->account_id = auth()->user()->account->id;
+            $accountCard->card_number = $request->card_number;
+            $accountCard->card_brand = $token->card->brand;
+            $accountCard->security_code = $request->security_code;
+            $accountCard->expiry_month = $request->expiry_month;
+            $accountCard->expiry_year = $request->expiry_year;
+            $accountCard->save();
+            return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
+
+
+        } catch (Exception $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage(), 'payload' => null]);
+
+        }
+
+    }
+
+    public function saveCardForGuest(CardRequest $request): JsonResponse
+    {
+        $guestCard = $request->except(['_token']);
+        Session::forget('cards_for_guest');
+        Session::put('cards_for_guest', $guestCard);
+        return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
+    }
+
+    public function deleteCardFromAccount(Request $request)
+    {
+        AccountCard::where('id', $request->id)->delete();
+        return response()->json(['success' => true, 'message' => 'Card Deleted Successfully', 'payload' => null]);
     }
 
     public function isShippingAddressAvailable(): JsonResponse

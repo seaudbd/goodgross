@@ -544,89 +544,36 @@
                     $('#sign_in_form_submit_text').removeClass('sr-only');
                     $('#sign_in_form_submit_processing').addClass('sr-only');
                     if (authenticationResult.success === true) {
-
-
                         $('#sign_in_modal .btn-close').click();
-
-                        $.ajax({
-                            method: 'get',
-                            url: '{{ url('regenerate/csrf/token') }}',
-                            global: false,
-                            success: function (token) {
-                                console.log(token);
-
-                                if (whichAction === 'proceed_to_checkout') {
+                        if (whichAction === 'proceed_to_checkout') {
+                            $.ajax({
+                                method: 'get',
+                                url: '{{ url('cart/copy/items/to/checkout') }}',
+                                success: function (checkoutResult) {
+                                    console.log(checkoutResult);
                                     $.ajax({
                                         method: 'get',
-                                        url: '{{ url('cart/copy/items/to/checkout') }}',
-                                        success: function (checkoutResult) {
-                                            console.log(checkoutResult);
-                                            $.ajax({
-                                                method: 'get',
-                                                url: '{{ url('is/shipping/address/available') }}',
-                                                success: function (shippingAddressResult) {
-                                                    console.log(shippingAddressResult);
-                                                    if (shippingAddressResult.payload.length > 0) {
-                                                        location = '{{ url('checkout') }}';
-                                                    } else {
-                                                        location = '{{ url('delivery/address') }}';
-                                                    }
-                                                },
-                                                error: function (xhr) {
-                                                    console.log(xhr)
-                                                }
-                                            });
+                                        url: '{{ url('is/shipping/address/available') }}',
+                                        success: function (shippingAddressResult) {
+                                            console.log(shippingAddressResult);
+                                            if (shippingAddressResult.payload.length > 0) {
+                                                location = '{{ url('checkout') }}';
+                                            } else {
+                                                location = '{{ url('delivery/address') }}';
+                                            }
                                         },
                                         error: function (xhr) {
                                             console.log(xhr)
                                         }
                                     });
-
-                                    {{--location = '{{ url('checkout') }}';--}}
-
-                                } else {
-                                    {{--let addToWatchFormData = new FormData();--}}
-                                    {{--addToWatchFormData.append('_token', token);--}}
-                                    {{--addToWatchFormData.append('product_id', '{{ $product->id }}');--}}
-                                    {{--$.ajax({--}}
-                                    {{--    method: 'post',--}}
-                                    {{--    url: '{{ url('product/add/to/watch') }}',--}}
-                                    {{--    data: addToWatchFormData,--}}
-                                    {{--    processData: false,--}}
-                                    {{--    contentType: false,--}}
-                                    {{--    success: function (response) {--}}
-                                    {{--        console.log(response);--}}
-
-
-                                    {{--        $('#sign_in_modal .btn-close').click();--}}
-                                    {{--        $('#add_to_watch').text('View Watch List').attr('id', 'view_watch_list');--}}
-                                    {{--        $.toast({--}}
-                                    {{--            text : result.message,--}}
-                                    {{--            showHideTransition : 'slide',--}}
-                                    {{--            bgColor : 'green',--}}
-                                    {{--            textColor : '#eee',--}}
-                                    {{--            allowToastClose : true,--}}
-                                    {{--            hideAfter : 5000,--}}
-                                    {{--            stack : 5,--}}
-                                    {{--            textAlign : 'left',--}}
-                                    {{--            position : 'bottom-left'--}}
-                                    {{--        });--}}
-                                    {{--        location.reload();--}}
-                                    {{--    },--}}
-                                    {{--    error: function (xhr) {--}}
-                                    {{--        console.log(xhr)--}}
-                                    {{--    }--}}
-                                    {{--});--}}
+                                },
+                                error: function (xhr) {
+                                    console.log(xhr)
                                 }
+                            });
+                        } else {
 
-
-
-                            },
-                            error: function (xhr) {
-                                console.log(xhr)
-                            }
-                        });
-
+                        }
                     } else {
                         if (authenticationResult.message === 'Pending Account') {
                             location = '{{ url('email/verification') }}/' + authenticationResult.account.id;
@@ -684,38 +631,6 @@
                 }
             });
         });
-
-
-
-
-
-
-
-        {{--$(document).on('click', '.checkout_as_guest', function () {--}}
-        {{--    $.ajax({--}}
-        {{--        method: 'get',--}}
-        {{--        url: '{{ url('cart/copy/product/to/checkout') }}',--}}
-        {{--        success: function (result) {--}}
-        {{--            console.log(result);--}}
-        {{--            location = '{{ url('checkout') }}';--}}
-        {{--        },--}}
-        {{--        error: function (xhr) {--}}
-        {{--            console.log(xhr)--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--});--}}
-
-
-
-
-
-
-
-
-
-
-
-
 
     </script>
 @endsection
