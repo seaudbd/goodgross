@@ -281,7 +281,7 @@
                                             PayPal
                                         </label>
                                     </div>
-                                    <div style="color: #91a1a5; font-size: small; padding-left: 20px;">You will be redirected to PayPal website to complete your purchase securely.</div>
+                                    <div style="color: #91a1a5; font-size: small; padding-left: 25px;">You will be redirected to PayPal website to complete your purchase securely.</div>
                                 </div>
                                 <div class="col">
                                     <img src="{{ asset('storage/img/application/paypal_cut.png') }}" class="img-fluid" alt="PayPal">
@@ -297,7 +297,7 @@
                                             Debit or Credit Card
                                         </label>
                                     </div>
-                                    <div style="color: #91a1a5; font-size: small; padding-left: 20px;">Safe money transfer using Visa, Maestro, Discover, American Express.</div>
+                                    <div style="color: #91a1a5; font-size: small; padding-left: 25px;">Safe money transfer using Visa, Maestro, Discover, American Express.</div>
                                 </div>
                                 <div class="col">
                                     <img src="{{ asset('storage/img/application/cards.png') }}" class="img-fluid" alt="PayPal">
@@ -331,18 +331,18 @@
                                         <div class="form-floating" style="width: 40%;">
                                             <select class="form-select" name="expiry_month" id="expiry_month">
                                                 <option value="">Select Month</option>
-                                                <option value="01">January</option>
-                                                <option value="02">February</option>
-                                                <option value="03">March</option>
-                                                <option value="04">April</option>
-                                                <option value="05">May</option>
-                                                <option value="06">June</option>
-                                                <option value="07">July</option>
-                                                <option value="08">August</option>
-                                                <option value="09">September</option>
-                                                <option value="10">October</option>
-                                                <option value="11">November</option>
-                                                <option value="12">December</option>
+                                                <option value="January">January</option>
+                                                <option value="February">February</option>
+                                                <option value="March">March</option>
+                                                <option value="April">April</option>
+                                                <option value="May">May</option>
+                                                <option value="June">June</option>
+                                                <option value="July">July</option>
+                                                <option value="August">August</option>
+                                                <option value="September">September</option>
+                                                <option value="October">October</option>
+                                                <option value="November">November</option>
+                                                <option value="December">December</option>
                                             </select>
                                             <label for="expiry_month">Month</label>
                                         </div>
@@ -357,6 +357,8 @@
                                         </div>
 
                                     </div>
+
+
 
                                     <div class="row">
                                         <div class="col d-grid">
@@ -374,7 +376,7 @@
                         </div>
 
 
-                        <div class="text-secondary fw-bold p-2 mb-4" style="background-color: #efefef;">Order Summary</div>
+                        <div class="text-secondary fw-bold p-2 my-4" style="background-color: #efefef;">Order Summary</div>
                         <div id="order_summary_container">
 
                         </div>
@@ -1392,6 +1394,12 @@
             $('#card_form_container').hide();
         });
 
+        function clearCardForm() {
+            $('#card_form').find('.invalid-feedback').remove();
+            $('#card_form').find('.is-invalid').removeClass('is-invalid');
+            $('#card_form')[0].reset();
+        }
+
 
         $(document).on('click', '.delete_card_from_account', function () {
             $.ajax({
@@ -1412,6 +1420,226 @@
             });
         });
 
+        $(document).on('click', '.select_card_for_account', function () {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/select/card/for/account') }}',
+                data: {
+                    id: $(this).data('id')
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    loadCardsForAccount();
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        $(document).on('click', '#add_card_for_account', function () {
+            clearCardForm();
+            $('#cards_container').empty().hide();
+            $('#payment_option_message').removeClass('text-success').addClass('text-danger').text('Enter Your Card Details');
+            $('#place_order_button_text').text('Confirm to Place Order');
+            $('#place_order_button').attr('disabled', true);
+            $('#card_form_container').show(1000);
+        });
+
+        $(document).on('click', '.edit_card_for_account', function () {
+            let id = $(this).data('id');
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/account/card/by/id') }}',
+                data: {
+                    id: id
+                },
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    let cardBrandImagePath = result.payload.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (result.payload.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (result.payload.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (result.payload.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                    $('#card_' + id).empty();
+
+                    let months = {
+                        'January': 'January',
+                        'February': 'February',
+                        'March': 'March',
+                        'April': 'April',
+                        'May': 'May',
+                        'June': 'June',
+                        'July': 'July',
+                        'August': 'August',
+                        'September': 'September',
+                        'October': 'October',
+                        'November': 'November',
+                        'December': 'December',
+                    };
+
+                    let monthOptions = '';
+                    $.each(months, function (key, value) {
+                        if (result.payload.expiry_month === value) {
+                            monthOptions += '<option value="' + key + '" selected>' + value + '</option>';
+                        } else {
+                            monthOptions += '<option value="' + key + '">' + value + '</option>';
+                        }
+                    });
+
+                    let yearOptions = '';
+                    for(let i = new Date().getFullYear(); i <= new Date().getFullYear() + 10; i++) {
+                        if (result.payload.expiry_year === i) {
+                            yearOptions += '<option value="' + i + '" selected>' + i + '</option>';
+                        } else {
+                            yearOptions += '<option value="' + i + '">' + i + '</option>';
+                        }
+                    }
+
+
+                    $('#card_' + id).append(`
+                        <form id="card_form_for_edit">
+                            <input type="hidden" name="id" value="` + result.payload.id + `">
+                            <input type="hidden" name="card_number" value="` + result.payload.card_number + `">
+                            <div class="row mt-3">
+                                <div class="col-7">
+                                    <div class="row">
+                                        <div class="col"><img src="` + cardBrandImagePath + `" class="img-fluid"></div>
+                                        <div class="col ps-0 pt-3">ending in ` + result.payload.card_number.substr(-4) + `</div>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-floating">
+                                        <input type="text" autocomplete="off" class="form-control" name="security_code" id="security_code_for_edit" value="` + result.payload.security_code + `">
+                                        <label for="security_code_for_edit">Security Code</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group my-4">
+                                <span class="input-group-text" style="font-size: small; color: #615f75; width: 24%;">Expiry Date</span>
+                                <div class="form-floating" style="width: 38%;">
+                                    <select class="form-select" name="expiry_month" id="expiry_month_for_edit" style="font-size: 12px;">
+                                        <option value="">Select Month</option>
+                                        ` + monthOptions + `
+                                    </select>
+                                    <label for="expiry_month_for_edit">Month</label>
+                                </div>
+                                <div class="form-floating" style="width: 38%;">
+                                    <select class="form-select" name="expiry_year" id="expiry_year_for_edit" style="font-size: 12px;">
+                                        <option value="">Select Year</option>
+                                        ` + yearOptions + `
+                                    </select>
+                                    <label for="expiry_year_for_edit">Year</label>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col d-grid">
+                                    <button type="submit" class="mod_button_1" id="card_form_for_edit_submit_button">
+                                        <span id="card_form_for_edit_submit_button_text">Update</span>
+                                        <span id="card_form_for_edit_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
+                                    </button>
+                                </div>
+                                <div class="col d-grid">
+                                    <button type="button" class="mod_button_2" id="card_form_for_edit_cancel_button">Cancel</button>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    `);
+                    $('#add_card_for_account').parent().remove();
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        $(document).on('submit', '#card_form_for_edit', function (event) {
+            event.preventDefault();
+
+            $('#card_form_for_edit').find('.invalid-feedback').remove();
+            $('#card_form_for_edit').find('.is-invalid').removeClass('is-invalid');
+
+            $('#card_form_for_edit_submit_button').addClass('disabled');
+            $('#card_form_for_edit_submit_button_text').addClass('sr-only');
+            $('#card_form_for_edit_submit_button_processing').removeClass('sr-only');
+            let formData = new FormData(this);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            let isGuest = '{{ $isGuest }}';
+            let url = isGuest ? '{{ url('checkout/save/card/for/guest') }}' : '{{ url('checkout/save/card/for/account') }}';
+            $.ajax({
+                method: 'post',
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                cache: false,
+                global: false,
+                success: function (result) {
+                    console.log(result);
+                    $('#card_form_for_edit_submit_button').removeClass('disabled');
+                    $('#card_form_for_edit_submit_button_text').removeClass('sr-only');
+                    $('#card_form_for_edit_submit_button_processing').addClass('sr-only');
+                    if (result.success === true) {
+                        if (isGuest) {
+                            loadCardForGuest();
+                        } else {
+                            loadCardsForAccount();
+                        }
+                    } else {
+                        $('#card_form_for_edit').prepend('<div class="text-danger small invalid-feedback d-block mb-4">' + result.message + '</div>');
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                    $('#card_form_for_edit_submit_button').removeClass('disabled');
+                    $('#card_form_for_edit_submit_button_text').removeClass('sr-only');
+                    $('#card_form_for_edit_submit_button_processing').addClass('sr-only');
+                    if (xhr.responseJSON.hasOwnProperty('errors')) {
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            if (key === 'expiry_month' || key === 'expiry_year') {
+                                if (key === 'expiry_month') {
+                                    $('#' + key + '_for_edit').parent().parent().after('<div class="invalid-feedback expiry_month_error_message d-block mb-4"></div>');
+                                    $('#' + key + '_for_edit').addClass('is-invalid');
+                                    $.each(value, function (k, v) {
+                                        $('#' + key + '_for_edit').parent().parent().parent().find('.expiry_month_error_message').append('<div>' + v + '</div>');
+                                    });
+                                }
+                                if (key === 'expiry_year') {
+                                    $('#' + key + '_for_edit').parent().parent().after('<div class="invalid-feedback expiry_year_error_message d-block mb-4"></div>');
+                                    $('#' + key + '_for_edit').addClass('is-invalid');
+                                    $.each(value, function (k, v) {
+                                        $('#' + key + '_for_edit').parent().parent().parent().find('.expiry_year_error_message').append('<div>' + v + '</div>');
+                                    });
+                                }
+                            } else {
+                                $('#' + key + '_for_edit').after('<div class="invalid-feedback"></div>');
+                                $('#' + key + '_for_edit').addClass('is-invalid');
+                                $.each(value, function (k, v) {
+                                    $('#' + key + '_for_edit').parent().find('.invalid-feedback').append('<div>' + v + '</div>');
+                                });
+                            }
+
+                        })
+                    }
+                }
+            });
+
+        })
+
+
+        $(document).on('click', '#card_form_for_edit_cancel_button', function () {
+            let isGuest = '{{ $isGuest }}';
+            if (isGuest) {
+                loadCardForGuest();
+            } else {
+                loadCardsForAccount();
+            }
+        });
+
         function loadCardsForAccount() {
             $('#cards_container').hide();
             $('#card_form_container').hide();
@@ -1424,19 +1652,74 @@
                     if (result.payload.length > 0) {
                         $('#cards_container').empty();
                         let cardBrandImagePath;
-                        $.each(result.payload, function (key, card) {
-                            cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
-                            console.log(cardBrandImagePath);
-                            $('#cards_container').append(`
-                                <div class="card">
-                                    <div class="card-body small">
-                                        <div class="row"><div class="col-8"><div>` + card.card_brand + ` Ending in ` + card.card_number.substr(-4) + `</div><div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div><div class="mt-3"><a href="javascript:void(0)" id="edit_card_for_account" data-id="` + card.id + `">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="` + card.id + `">Delete</a></div></div><div class="col-4"><img src="` + cardBrandImagePath + `" class="img-fluid"></div></div>
+                        let cardNumberLast4Digits;
+                        let selectedCardLast4Digits;
+                        if (result.payload.length > 1) {
+                            let cardLinks;
+                            let selectedCardColor;
+                            let selectedText;
+                            $.each(result.payload, function (key, card) {
+                                cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                                cardNumberLast4Digits = card.card_number.substr(-4);
+                                if (parseInt(card.is_selected) === 1) {
+                                    selectedCardLast4Digits = card.card_number.substr(-4);
+                                    cardLinks = '<a href="javascript:void(0)" class="edit_card_for_account" data-id="' + card.id + '">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a>';
+                                    selectedCardColor = 'ghostwhite';
+                                    selectedText = '<div style="position: absolute; left: 0; top: 0; background-color: darkblue; border-radius: 5px; color: white; padding: 2px 5px;">Selected</div>'
+                                } else {
+                                    cardLinks = '<a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a> | <a href="javascript:void(0)" class="select_card_for_account" data-id="' + card.id + '">Select</a>';
+                                    selectedCardColor = 'white';
+                                    selectedText = '';
+                                }
+
+                                $('#cards_container').append(`
+                                    <div class="ps-xxl-4 ps-xl-4 ps-lg-4 ps-md-4 ps-sm-4 p-0">
+                                        <div class="card mb-4" style="background-color: ` + selectedCardColor + `">
+                                            <div class="card-body small">
+                                                ` + selectedText + `
+                                                <div class="row mt-3" id="card_` + card.id + `">
+                                                    <div class="col-8">
+                                                        <div>` + card.card_brand + ` ending in ` + cardNumberLast4Digits + `</div>
+                                                        <div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div>
+                                                        <div class="mt-3">` + cardLinks + `</div>
+                                                    </div>
+                                                    <div class="col-4"><img src="` + cardBrandImagePath + `" class="img-fluid"></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            `);
-                        });
+                                `);
+                            });
+                        } else {
+                            $.each(result.payload, function (key, card) {
+                                cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                                cardNumberLast4Digits = card.card_number.substr(-4);
+                                selectedCardLast4Digits = card.card_number.substr(-4);
+                                $('#cards_container').append(`
+                                    <div class="ps-xxl-4 ps-xl-4 ps-lg-4 ps-md-4 ps-sm-4 p-0">
+                                        <div class="card">
+                                            <div class="card-body small">
+                                                <div class="row mt-3" id="card_` + card.id + `">
+                                                    <div class="col-8">
+                                                        <div>` + card.card_brand + ` ending in ` + cardNumberLast4Digits + `</div>
+                                                        <div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div>
+                                                        <div class="mt-3">
+                                                            <a href="javascript:void(0)" class="edit_card_for_account" data-id="` + card.id + `">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="` + card.id + `">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <img src="` + cardBrandImagePath + `" class="img-fluid">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        }
+                        $('#cards_container').append('<div class="mt-4 ps-4 d-grid"><button type="button" class="mod_button_1" id="add_card_for_account">Add New Card</button></div>');
                         $('#cards_container').show(1000);
-                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card');
+                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card ending in ' + selectedCardLast4Digits);
                         $('#place_order_button_text').text('Place Order');
                         $('#place_order_button').removeAttr('disabled');
                     } else {
@@ -1453,32 +1736,43 @@
             });
         }
 
-        function loadCardsForGuest() {
+        function loadCardForGuest() {
             $('#cards_container').hide();
             $('#card_form_container').hide();
             $.ajax({
                 method: 'get',
-                url: '{{ url('checkout/get/guest/cards') }}',
+                url: '{{ url('checkout/get/guest/card') }}',
                 cache: false,
                 success: function (result) {
                     console.log(result);
-                    if (result.payload.length > 0) {
+                    if (result.payload !== null) {
 
                         $('#cards_container').empty();
-                        let cardBrandImagePath;
-                        $.each(result.payload, function (key, card) {
-                            cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
-                            console.log(cardBrandImagePath);
-                            $('#cards_container').append(`
+
+                        let cardBrandImagePath = result.payload.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (result.payload.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (result.payload.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (result.payload.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+
+                        $('#cards_container').append(`
+                            <div class="ps-xxl-4 ps-xl-4 ps-lg-4 ps-md-4 ps-sm-4 p-0">
                                 <div class="card">
                                     <div class="card-body small">
-                                        <div class="row"><div class="col-8"><div>` + card.card_brand + ` Ending in ` + card.card_number.substr(-4) + `</div><div>Expires on ` + card.expiry_month + '/' + card.expiry_year  + `</div><div class="mt-3"><a href="javascript:void(0)" id="edit_card_for_account" data-id="` + card.id + `">Edit</a> | <a href="javascript:void(0)" id="delete_card_for_account" data-id="` + card.id + `">Delete</a></div></div><div class="col-4"><img src="` + cardBrandImagePath + `" class="img-fluid"></div></div>
+                                        <div class="row" id="card_` + result.payload.card_number + `">
+                                            <div class="col-8">
+                                                <div>` + result.payload.card_brand + ` ending in ` + result.payload.card_number.substr(-4) + `</div>
+                                                <div>Expires on ` + result.payload.expiry_month + '/' + result.payload.expiry_year  + `</div>
+                                                <div class="mt-3">
+                                                    <a href="javascript:void(0)" id="edit_card_for_guest" data-card_number="` + result.payload.card_number + `">Edit</a> | <a href="javascript:void(0)" id="delete_card_for_guest">Delete</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <img src="` + cardBrandImagePath + `" class="img-fluid">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            `);
-                        });
+                            </div>
+                        `);
                         $('#cards_container').show(1000);
-                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card');
+                        $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card ending in ' + result.payload.card_number.substr(-4));
                         $('#place_order_button_text').text('Place Order');
                         $('#place_order_button').removeAttr('disabled');
 
@@ -1495,6 +1789,128 @@
                 }
             });
         }
+
+
+        $(document).on('click', '#edit_card_for_guest', function () {
+            let cardNumber = $(this).data('card_number');
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/card') }}',
+
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    let cardBrandImagePath = result.payload.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (result.payload.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (result.payload.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (result.payload.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
+                    $('#card_' + cardNumber).empty();
+                    let months = {
+                        'January': 'January',
+                        'February': 'February',
+                        'March': 'March',
+                        'April': 'April',
+                        'May': 'May',
+                        'June': 'June',
+                        'July': 'July',
+                        'August': 'August',
+                        'September': 'September',
+                        'October': 'October',
+                        'November': 'November',
+                        'December': 'December',
+                    };
+
+                    let monthOptions = '';
+                    $.each(months, function (key, value) {
+                        if (result.payload.expiry_month === value) {
+                            monthOptions += '<option value="' + key + '" selected>' + value + '</option>';
+                        } else {
+                            monthOptions += '<option value="' + key + '">' + value + '</option>';
+                        }
+                    });
+
+                    let yearOptions = '';
+                    for(let i = new Date().getFullYear(); i <= new Date().getFullYear() + 10; i++) {
+                        if (parseInt(result.payload.expiry_year) === i) {
+                            yearOptions += '<option value="' + i + '" selected>' + i + '</option>';
+                        } else {
+                            yearOptions += '<option value="' + i + '">' + i + '</option>';
+                        }
+                    }
+
+
+                    $('#card_' + cardNumber).append(`
+                        <form id="card_form_for_edit">
+
+                            <input type="hidden" name="card_number" value="` + result.payload.card_number + `">
+                            <div class="row mt-3">
+                                <div class="col-7">
+                                    <div class="row">
+                                        <div class="col"><img src="` + cardBrandImagePath + `" class="img-fluid"></div>
+                                        <div class="col ps-0 pt-3">ending in ` + result.payload.card_number.substr(-4) + `</div>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-floating">
+                                        <input type="text" autocomplete="off" class="form-control" name="security_code" id="security_code_for_edit" value="` + result.payload.security_code + `">
+                                        <label for="security_code_for_edit">Security Code</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group my-4">
+                                <span class="input-group-text" style="font-size: small; color: #615f75; width: 24%;">Expiry Date</span>
+                                <div class="form-floating" style="width: 38%;">
+                                    <select class="form-select" name="expiry_month" id="expiry_month_for_edit" style="font-size: 12px;">
+                                        <option value="">Select Month</option>
+                                        ` + monthOptions + `
+                                    </select>
+                                    <label for="expiry_month_for_edit">Month</label>
+                                </div>
+                                <div class="form-floating" style="width: 38%;">
+                                    <select class="form-select" name="expiry_year" id="expiry_year_for_edit" style="font-size: 12px;">
+                                        <option value="">Select Year</option>
+                                        ` + yearOptions + `
+                                    </select>
+                                    <label for="expiry_year_for_edit">Year</label>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col d-grid">
+                                    <button type="submit" class="mod_button_1" id="card_form_for_edit_submit_button">
+                                        <span id="card_form_for_edit_submit_button_text">Update</span>
+                                        <span id="card_form_for_edit_submit_button_processing" class="sr-only"><span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span> Processing...</span>
+                                    </button>
+                                </div>
+                                <div class="col d-grid">
+                                    <button type="button" class="mod_button_2" id="card_form_for_edit_cancel_button">Cancel</button>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    `);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+
+        $(document).on('click', '#delete_card_for_guest', function () {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/delete/guest/card') }}',
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    clearCardForm();
+                    loadCardForGuest();
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
 
 
         $(document).on('click', '.payment_option', function () {
@@ -1502,7 +1918,7 @@
 
                 let isGuest = '{{ $isGuest }}';
                 if (isGuest) {
-                    loadCardsForGuest();
+                    loadCardForGuest();
                 } else {
                     loadCardsForAccount();
                 }
@@ -1548,7 +1964,7 @@
 
                     if (result.success === true) {
                         if (isGuest) {
-                            loadCardsForGuest();
+                            loadCardForGuest();
                         } else {
                             loadCardsForAccount();
                         }
@@ -1598,9 +2014,8 @@
         });
 
         $(document).on('click', '#card_form_cancel_button', function () {
+            clearCardForm();
             $('#cards_container').empty().hide();
-            $('#card_form').find('.invalid-feedback').remove();
-            $('#card_form').find('.is-invalid').removeClass('is-invalid');
             $('#card_form_container').hide(1000);
             $('.payment_option').prop('checked', false);
             $('#payment_option_message').removeClass('text-success').addClass('text-danger').text('Select a Payment Option');

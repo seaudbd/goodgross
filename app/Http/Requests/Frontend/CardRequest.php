@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Frontend;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CardRequest extends FormRequest
 {
@@ -28,10 +29,12 @@ class CardRequest extends FormRequest
             'nullable',
             'numeric'
         ];
+
         $rules['card_number'] = [
             'required',
             'digits_between:14,16',
         ];
+
         $rules['security_code'] = [
             'required',
             'digits_between:3,4',
@@ -39,8 +42,7 @@ class CardRequest extends FormRequest
         $rules['expiry_month'] = [
             'required',
             'string',
-            'min:2',
-            'max:2',
+            Rule::in(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']),
         ];
 
         $rules['expiry_year'] = [

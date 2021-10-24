@@ -230,12 +230,30 @@ class CheckoutController extends Controller
 
     public function getAccountCards(): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Account Cards Fetched Successfully', 'payload' => AccountCard::where('account_id', auth()->user()->account->id)->get()]);
+        return response()->json(['success' => true, 'message' => 'Account Cards Fetched Successfully', 'payload' => AccountCard::where('account_id', auth()->user()->account->id)->latest()->get()]);
     }
 
-    public function getGuestCards(): JsonResponse
+    public function getAccountCardById(Request $request)
     {
-        return response()->json(['success' => true, 'message' => 'Guest Cards Fetched Successfully', 'payload' => Session::get('cards_for_guest')]);
+        return response()->json(['success' => true, 'message' => 'Account Card Fetched Successfully', 'payload' => AccountCard::where('id', $request->id)->first()]);
+    }
+
+    public function deleteCardFromAccount(Request $request)
+    {
+        $accountCard = AccountCard::where('id', $request->id)->first();
+        AccountCard::where('id', $request->id)->delete();
+        if ($accountCard->is_selected === 1) {
+            if (AccountCard::where('account_id', auth()->user()->account->id)->get()->isNotEmpty()) {
+                AccountCard::where('account_id', auth()->user()->account->id)->latest()->first()->update(['is_selected' => 1]);
+            }
+        }
+        return response()->json(['success' => true, 'message' => 'Card Deleted Successfully', 'payload' => null]);
+    }
+
+    public function selectCardForAccount(Request $request)
+    {
+        AccountCard::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
+        AccountCard::where('id', $request->id)->update(['is_selected' => 1]);
     }
 
     public function saveCardForAccount(CardRequest $request): JsonResponse
@@ -246,11 +264,26 @@ class CheckoutController extends Controller
             $stripeConf['secret']
         );
 
+        $months = [
+            '01' => 'January',
+            '02' => 'February',
+            '03' => 'March',
+            '04' => 'April',
+            '05' => 'May',
+            '06' => 'June',
+            '07' => 'July',
+            '08' => 'August',
+            '09' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December',
+        ];
+
         try {
             $token = $stripe->tokens->create([
                 'card' => [
                     'number' => $request->card_number,
-                    'exp_month' => $request->expiry_month,
+                    'exp_month' => array_keys($months, $request->expiry_month)[0],
                     'exp_year' => $request->expiry_year,
                     'cvc' => $request->security_code,
                 ],
@@ -258,14 +291,19 @@ class CheckoutController extends Controller
             if (!isset($token->id)) {
                 return response()->json(['success' => false, 'message' => 'Token Generation Failed', 'payload' => null]);
             }
-            //return response()->json($token);
-            $accountCard = new AccountCard();
-            $accountCard->account_id = auth()->user()->account->id;
-            $accountCard->card_number = $request->card_number;
-            $accountCard->card_brand = $token->card->brand;
+
+            AccountCard::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
+            $accountCard = $request->has('id') ? AccountCard::find($request->id) : new AccountCard();
+            if ( ! $request->has('id')) {
+                $accountCard->account_id = auth()->user()->account->id;
+                $accountCard->card_number = $request->card_number;
+                $accountCard->card_brand = $token->card->brand;
+            }
+
             $accountCard->security_code = $request->security_code;
             $accountCard->expiry_month = $request->expiry_month;
             $accountCard->expiry_year = $request->expiry_year;
+            $accountCard->is_selected = 1;
             $accountCard->save();
             return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
 
@@ -277,19 +315,63 @@ class CheckoutController extends Controller
 
     }
 
-    public function saveCardForGuest(CardRequest $request): JsonResponse
+    public function getGuestCard(): JsonResponse
     {
-        $guestCard = $request->except(['_token']);
-        Session::forget('cards_for_guest');
-        Session::put('cards_for_guest', $guestCard);
-        return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
+        $cardForGuest = Session::has('card_for_guest') ? Session::get('card_for_guest') : null;
+        return response()->json(['success' => true, 'message' => 'Guest Card Fetched Successfully', 'payload' => $cardForGuest]);
     }
 
-    public function deleteCardFromAccount(Request $request)
+    public function deleteGuestCard()
     {
-        AccountCard::where('id', $request->id)->delete();
-        return response()->json(['success' => true, 'message' => 'Card Deleted Successfully', 'payload' => null]);
+        Session::forget('card_for_guest');
+        return response()->json(['success' => true, 'message' => 'Guest Card Deleted Successfully', 'payload' => null]);
     }
+
+    public function saveCardForGuest(CardRequest $request): JsonResponse
+    {
+        $stripeConf = Config::get('stripe');
+        $stripe = new StripeClient(
+            $stripeConf['secret']
+        );
+
+        $months = [
+            '01' => 'January',
+            '02' => 'February',
+            '03' => 'March',
+            '04' => 'April',
+            '05' => 'May',
+            '06' => 'June',
+            '07' => 'July',
+            '08' => 'August',
+            '09' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December',
+        ];
+
+        try {
+            $token = $stripe->tokens->create([
+                'card' => [
+                    'number' => $request->card_number,
+                    'exp_month' => array_keys($months, $request->expiry_month)[0],
+                    'exp_year' => $request->expiry_year,
+                    'cvc' => $request->security_code,
+                ],
+            ]);
+            if (!isset($token->id)) {
+                return response()->json(['success' => false, 'message' => 'Token Generation Failed', 'payload' => null]);
+            }
+            $guestCard = $request->except(['_token']);
+            $guestCard['card_brand'] = $token->card->brand;
+            Session::forget('card_for_guest');
+            Session::put('card_for_guest', $guestCard);
+            return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
+
+        } catch (Exception $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage(), 'payload' => null]);
+        }
+    }
+
 
     public function isShippingAddressAvailable(): JsonResponse
     {

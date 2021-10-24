@@ -106,13 +106,17 @@ Route::get('checkout/get/guest/billing/address', [CheckoutController::class, 'ge
 Route::get('checkout/get/account/billing/address/by/id', [CheckoutController::class, 'getAccountBillingAddressById']);
 Route::post('checkout/save/billing/address/for/account', [CheckoutController::class, 'saveBillingAddressForAccount']);
 Route::post('checkout/save/billing/address/for/guest', [CheckoutController::class, 'saveBillingAddressForGuest']);
-Route::get('checkout/delete/card/from/account', [CheckoutController::class, 'deleteCardFromAccount']);
+
 
 
 Route::get('checkout/get/account/cards', [CheckoutController::class, 'getAccountCards']);
-Route::get('checkout/get/guest/cards', [CheckoutController::class, 'getGuestCards']);
+Route::get('checkout/get/account/card/by/id', [CheckoutController::class, 'getAccountCardById']);
+Route::get('checkout/delete/card/from/account', [CheckoutController::class, 'deleteCardFromAccount']);
+Route::get('checkout/select/card/for/account', [CheckoutController::class, 'selectCardForAccount']);
 Route::post('checkout/save/card/for/account', [CheckoutController::class, 'saveCardForAccount']);
+Route::get('checkout/get/guest/card', [CheckoutController::class, 'getGuestCard']);
 Route::post('checkout/save/card/for/guest', [CheckoutController::class, 'saveCardForGuest']);
+Route::get('checkout/delete/guest/card', [CheckoutController::class, 'deleteGuestCard']);
 
 //Route::get('checkout/add/product', [CheckoutController::class, 'addProduct']);
 Route::post('checkout', [CheckoutController::class, 'processCheckout']);
