@@ -57,7 +57,7 @@ class DeliveryAddressController extends Controller
         $accountShipping->address_line_2 = $request->address_line_2;
         $accountShipping->phone = $request->phone;
         $accountShipping->email = $request->email;
-        $accountShipping->is_primary = $request->is_primary;
+//        $accountShipping->is_primary = $request->is_primary;
         $accountShipping->is_selected = $request->is_selected;
         $accountShipping->save();
 
@@ -73,8 +73,8 @@ class DeliveryAddressController extends Controller
         $accountBilling->address_line_2 = $request->address_line_2;
         $accountBilling->phone = $request->phone;
         $accountBilling->email = $request->email;
-        $accountBilling->is_primary = $request->is_primary;
-        $accountBilling->is_selected = $request->is_selected;
+//        $accountBilling->is_primary = $request->is_primary;
+//        $accountBilling->is_selected = $request->is_selected;
         $accountBilling->save();
 
 

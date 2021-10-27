@@ -429,7 +429,7 @@
             $('#delivery_address_form_button_processing').removeClass('sr-only');
             let formData = new FormData(this);
             formData.append('_token', '{{ csrf_token() }}');
-            formData.append('is_primary', '1');
+            // formData.append('is_primary', '1');
             formData.append('is_selected', '1');
             let isGuest = '{{ $isGuest }}';
             let url = isGuest ? '{{ url('delivery/address/store/in/session') }}' : '{{ url('delivery/address/store/in/database') }}';

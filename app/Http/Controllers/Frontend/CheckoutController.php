@@ -100,21 +100,18 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Checkout Items Fetched Successfully', 'payload' => Session::get('checkout_items')]);
     }
 
+//    public function getAccountDeliveryAddress(): JsonResponse
+//    {
+//        $accountShipping = AccountShipping::where('account_id', auth()->user()->account->id)->where('is_primary', 1)->first();
+//        return response()->json(['success' => true, 'message' => 'Account Delivery Address Fetched Successfully', 'payload' => $accountShipping]);
+//    }
+
     public function getAccountDeliveryAddresses(): JsonResponse
     {
-        $accountShippings = AccountShipping::where('account_id', auth()->user()->account->id)->orderBy('is_primary', 'desc')->get();
+        $accountShippings = AccountShipping::where('account_id', auth()->user()->account->id)->latest('is_selected')->latest('created_at')->get();
         return response()->json(['success' => true, 'message' => 'Delivery Addresses Fetched Successfully', 'payload' => $accountShippings]);
     }
 
-    public function getAccountDeliveryAddress(): JsonResponse
-    {
-        return response()->json(['success' => true, 'message' => 'Account Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('account_id', auth()->user()->account->id)->where('is_primary', 1)->first()]);
-    }
-
-    public function getGuestDeliveryAddress(): JsonResponse
-    {
-        return response()->json(['success' => true, 'message' => 'Guest Delivery Address Fetched Successfully', 'payload' => Session::get('delivery_address_for_guest')]);
-    }
     public function selectAccountDeliveryAddress(Request $request): JsonResponse
     {
         AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
@@ -129,7 +126,8 @@ class CheckoutController extends Controller
     }
     public function getAccountDeliveryAddressById(Request $request): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => AccountShipping::where('id', $request->id)->first()]);
+        $accountShipping = AccountShipping::where('id', $request->id)->first();
+        return response()->json(['success' => true, 'message' => 'Delivery Address Fetched Successfully', 'payload' => $accountShipping]);
     }
 
     public function saveAccountDeliveryAddress(DeliveryAddressRequest $request): JsonResponse
@@ -147,29 +145,38 @@ class CheckoutController extends Controller
         $accountShipping->address_line_2 = $request->address_line_2;
         $accountShipping->phone = $request->phone;
         $accountShipping->email = $request->email;
-        if ($request->has('id')) {
-            if ($request->has('is_primary')) {
-                if ($request->is_primary) {
-                    AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
-                    $accountShipping->is_primary = 1;
-                }
-            }
-        } else {
-            if ($request->is_primary === 'true' || (int)$request->is_primary === 1) {
-                AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
-                $accountShipping->is_primary = 1;
-            } else {
-                $accountShipping->is_primary = 0;
-            }
-            if ($request->has('is_selected')) {
-                $accountShipping->is_selected = $request->is_selected;
-            } else {
-                $accountShipping->is_selected = 0;
-            }
+//        if ($request->has('id')) {
+//            if ($request->has('is_primary')) {
+//                if ($request->is_primary) {
+//                    AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
+//                    $accountShipping->is_primary = 1;
+//                }
+//            }
+//        } else {
+//            if ($request->is_primary === 'true' || (int)$request->is_primary === 1) {
+//                AccountShipping::where('account_id', auth()->user()->account->id)->update(['is_primary' => 0]);
+//                $accountShipping->is_primary = 1;
+//            } else {
+//                $accountShipping->is_primary = 0;
+//            }
+//            if ($request->has('is_selected')) {
+//                $accountShipping->is_selected = $request->is_selected;
+//            } else {
+//                $accountShipping->is_selected = 0;
+//            }
+//        }
+
+        if ( ! $request->has('id')) {
+            $accountShipping->is_selected = 1;
         }
 
         $accountShipping->save();
         return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
+    }
+
+    public function getGuestDeliveryAddress(): JsonResponse
+    {
+        return response()->json(['success' => true, 'message' => 'Guest Delivery Address Fetched Successfully', 'payload' => Session::get('delivery_address_for_guest')]);
     }
 
     public function saveGuestDeliveryAddress(DeliveryAddressRequest $request): JsonResponse
@@ -182,20 +189,22 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Delivery Address Saved Successfully', 'payload' => null]);
     }
 
-
     public function getAccountBillingAddress(): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Account Billing Address Fetched Successfully', 'payload' => AccountBilling::where('account_id', auth()->user()->account->id)->first()]);
+        $accountBilling = AccountBilling::where('account_id', auth()->user()->account->id)->first();
+        return response()->json(['success' => true, 'message' => 'Account Billing Address Fetched Successfully', 'payload' => $accountBilling]);
     }
 
     public function getGuestBillingAddress(): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Guest Billing Address Fetched Successfully', 'payload' => Session::get('billing_address_for_guest')]);
+        $guestBilling = Session::get('billing_address_for_guest');
+        return response()->json(['success' => true, 'message' => 'Guest Billing Address Fetched Successfully', 'payload' => $guestBilling]);
     }
 
     public function getAccountBillingAddressById(Request $request): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Billing Address Fetched Successfully', 'payload' => AccountBilling::where('id', $request->id)->first()]);
+        $accountBilling = AccountBilling::where('id', $request->id)->first();
+        return response()->json(['success' => true, 'message' => 'Billing Address Fetched Successfully', 'payload' => $accountBilling]);
     }
 
 
@@ -230,7 +239,8 @@ class CheckoutController extends Controller
 
     public function getAccountCards(): JsonResponse
     {
-        return response()->json(['success' => true, 'message' => 'Account Cards Fetched Successfully', 'payload' => AccountCard::where('account_id', auth()->user()->account->id)->latest()->get()]);
+        $accountCards = AccountCard::where('account_id', auth()->user()->account->id)->latest('is_selected')->latest('created_at')->get();
+        return response()->json(['success' => true, 'message' => 'Account Cards Fetched Successfully', 'payload' => $accountCards]);
     }
 
     public function getAccountCardById(Request $request)
@@ -250,10 +260,11 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'message' => 'Card Deleted Successfully', 'payload' => null]);
     }
 
-    public function selectCardForAccount(Request $request)
+    public function selectCardForAccount(Request $request): JsonResponse
     {
         AccountCard::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
         AccountCard::where('id', $request->id)->update(['is_selected' => 1]);
+        return response()->json(['success' => true, 'message' => 'Card Selected Successfully', 'payload' => null]);
     }
 
     public function saveCardForAccount(CardRequest $request): JsonResponse
@@ -292,7 +303,10 @@ class CheckoutController extends Controller
                 return response()->json(['success' => false, 'message' => 'Token Generation Failed', 'payload' => null]);
             }
 
-            AccountCard::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
+            if ( ! $request->has('id')) {
+                AccountCard::where('account_id', auth()->user()->account->id)->update(['is_selected' => 0]);
+            }
+
             $accountCard = $request->has('id') ? AccountCard::find($request->id) : new AccountCard();
             if ( ! $request->has('id')) {
                 $accountCard->account_id = auth()->user()->account->id;
@@ -303,7 +317,10 @@ class CheckoutController extends Controller
             $accountCard->security_code = $request->security_code;
             $accountCard->expiry_month = $request->expiry_month;
             $accountCard->expiry_year = $request->expiry_year;
-            $accountCard->is_selected = 1;
+            if ( ! $request->has('id')) {
+                $accountCard->is_selected = 1;
+            }
+
             $accountCard->save();
             return response()->json(['success' => true, 'message' => 'Card Saved Successfully', 'payload' => null]);
 
@@ -388,16 +405,16 @@ class CheckoutController extends Controller
     }
 
 
-    public function addProduct(Request $request)
-    {
-        $product = Product::where('id', $request->get('product_id'))->with('account', 'productProperties')->first();
-        $product['quantity'] = $request->quantity;
-        Session::forget('checkout_items');
-        Session::push('checkout_items', $product);
-        return response()->json('Product Added Successfully');
-    }
+//    public function addProduct(Request $request)
+//    {
+//        $product = Product::where('id', $request->get('product_id'))->with('account', 'productProperties')->first();
+//        $product['quantity'] = $request->quantity;
+//        Session::forget('checkout_items');
+//        Session::push('checkout_items', $product);
+//        return response()->json('Product Added Successfully');
+//    }
 
-    public function finalize(CheckoutRequest $request)
+    public function finalize(CheckoutRequest $request): JsonResponse
     {
 
         $clientId = env('PAYPAL_CLIENT_ID');

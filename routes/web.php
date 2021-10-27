@@ -93,7 +93,7 @@ Route::get('checkout', [CheckoutController::class, 'loadCheckout']);
 Route::get('checkout/get/items', [CheckoutController::class, 'getItems']);
 
 Route::get('checkout/get/account/delivery/addresses', [CheckoutController::class, 'getAccountDeliveryAddresses']);
-Route::get('checkout/get/account/delivery/address', [CheckoutController::class, 'getAccountDeliveryAddress']);
+//Route::get('checkout/get/account/delivery/address', [CheckoutController::class, 'getAccountDeliveryAddress']);
 Route::get('checkout/get/guest/delivery/address', [CheckoutController::class, 'getGuestDeliveryAddress']);
 Route::get('checkout/select/account/delivery/address', [CheckoutController::class, 'selectAccountDeliveryAddress']);
 Route::get('checkout/delete/account/delivery/address', [CheckoutController::class, 'deleteAccountDeliveryAddress']);

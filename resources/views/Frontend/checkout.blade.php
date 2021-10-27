@@ -155,9 +155,6 @@
 
                         </div>
 
-                        <div class="text-secondary fw-bold p-2 mt-4" style="background-color: #efefef;">Shipping Method</div>
-
-
 
 
                         <div class="text-secondary fw-bold p-2 mt-4 mb-4" style="background-color: #efefef;">Billing To</div>
@@ -264,6 +261,9 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="text-secondary fw-bold p-2 mt-4" style="background-color: #efefef;">Shipping Method</div>
+
                     </div>
 
 
@@ -391,6 +391,26 @@
     </div>
     <div class="mt-3"></div>
     <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            let isGuest = '{{ $isGuest }}';
+            loadCheckoutItems();
+
+            if (isGuest) {
+                loadDeliveryAddressForGuest();
+                loadBillingAddressForGuest();
+            } else {
+                loadDeliveryAddressesForAccount();
+                loadBillingAddressForAccount();
+            }
+
+            $('#delivery_address_form_container').hide();
+            $('#billing_address_form_container').hide();
+            $('#cards_container').hide();
+            $('#card_form_container').hide();
+        });
 
 
         function loadCheckoutItems() {
@@ -561,58 +581,11 @@
 
         function clearDeliveryAddressForm() {
             $('#delivery_address_form').find('#id').remove();
-            $('#save_as_primary_delivery_address').parent().remove();
             $('#country_id option').removeAttr('selected');
             $('#state_field_holder').empty();
             $('#delivery_address_form').find('.invalid-feedback').remove();
             $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
             $('#delivery_address_form')[0].reset();
-        }
-
-        function loadDeliveryAddressForAccount() {
-            $.ajax({
-                method: 'get',
-                url: '{{ url('checkout/get/account/delivery/address') }}',
-                success: function (result) {
-                    console.log(result);
-                    $('#delivery_addresses_container').empty();
-                    $('#delivery_addresses_container').append(`
-                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
-                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
-                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
-                        <div>` + result.payload.state + `</div>
-                        <div>` + result.payload.country + `</div>
-                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="change_delivery_address_for_account">Change</a></div>
-                    `);
-                },
-                error: function (xhr) {
-                    console.log(xhr)
-                }
-            });
-        }
-
-        function loadDeliveryAddressForGuest() {
-            $.ajax({
-                method: 'get',
-                url: '{{ url('checkout/get/guest/delivery/address') }}',
-                success: function (result) {
-                    console.log(result);
-                    $('#delivery_addresses_container').empty();
-                    $('#delivery_addresses_container').append(`
-                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
-                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
-                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
-                        <div>` + result.payload.state + `</div>
-                        <div>` + result.payload.country + `</div>
-                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="edit_delivery_address_for_guest">Edit</a> | <a href="javascript:void(0)" id="change_delivery_address_for_guest">Change</a></div>
-                    `);
-                },
-                error: function (xhr) {
-                    console.log(xhr)
-                }
-            });
         }
 
         function loadDeliveryAddressesForAccount() {
@@ -622,27 +595,52 @@
                 success: function (result) {
                     console.log(result);
                     $('#delivery_addresses_container').empty();
-                    if (result.payload.length > 0) {
+                    if (result.payload.length > 1) {
+                        let links;
+                        let selectedText;
+                        let selectedColor;
+                        let marginTop;
                         $.each(result.payload, function (key, accountShipping) {
-                            let selectionStatus = parseInt(accountShipping.is_selected) === 1 ? '<span class="py-1 px-3 bg-light me-3">Selected</span>' : '';
-                            let selectionLink = parseInt(accountShipping.is_selected) === 0 ? ' | <a href="javascript:void(0)" class="select_delivery_address_for_account" data-id="' + accountShipping.id + '">Select</a>' : '';
-                            let deletionLink = parseInt(accountShipping.is_primary) === 0 ? ' | <a href="javascript:void(0)" class="delete_delivery_address_for_account" data-id="' + accountShipping.id + '">Delete</a>' : '';
-                            let primaryStatus = parseInt(accountShipping.is_primary) === 1 ? '<span class="py-1 px-3 bg-light">Primary</span>' : '';
+                            links = parseInt(accountShipping.is_selected) === 0 ? '<a href="javascript:void(0)" class="edit_delivery_address_for_account" data-id="' + accountShipping.id + '">Edit</a> | <a href="javascript:void(0)" class="delete_delivery_address_for_account" data-id="' + accountShipping.id + '">Delete</a> | <a href="javascript:void(0)" class="select_delivery_address_for_account" data-id="' + accountShipping.id + '">Select</a>' : '<a href="javascript:void(0)" class="edit_delivery_address_for_account" data-id="' + accountShipping.id + '">Edit</a>';
+                            selectedText = parseInt(accountShipping.is_selected) === 1 ? '<div style="position: absolute; left: 0; top: 0; background-color: #37bd4b; border-radius: 5px; color: white; padding: 2px 5px;">Selected for Checkout</div>' : '';
+                            selectedColor = parseInt(accountShipping.is_selected) === 1 ? 'ghostwhite' : 'white';
+                            marginTop = parseInt(accountShipping.is_selected) === 1 ? '15px' : '0';
                             $('#delivery_addresses_container').append(`
-                                <div class="border-bottom py-3">
-                                    <div class="mb-3">` + selectionStatus + `` + primaryStatus + `</div>
+                                <div class="card mb-3" style="background-color: ` + selectedColor + `">
+                                    <div class="card-body">
+                                        ` + selectedText + `
+                                        <div style="margin-top: ` + marginTop + `">` + accountShipping.first_name + ' ' + accountShipping.last_name + `</div>
+                                        <div>` + accountShipping.address_line_1 + ', ' + accountShipping.address_line_2 + `</div>
+                                        <div>` + accountShipping.city + ' ' + accountShipping.postal_code + `</div>
+                                        <div>` + accountShipping.state + `</div>
+                                        <div>` + accountShipping.country + `</div>
+                                        <div>` + accountShipping.phone.substring(0,2) + 'xxxxxxx' + accountShipping.phone.slice(-2) + `</div>
+                                        <div class="mt-1">` + links + `</div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                        $('#delivery_addresses_container').append(`
+                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address_for_account">Add New Address</button></div></div>
+                        `);
+                    } else {
+                        let links;
+                        $.each(result.payload, function (key, accountShipping) {
+                            links = '<a href="javascript:void(0)" class="edit_delivery_address_for_account" data-id="' + accountShipping.id + '">Edit</a>';
+                            $('#delivery_addresses_container').append(`
+                                <div style="background-color: white;">
                                     <div>` + accountShipping.first_name + ' ' + accountShipping.last_name + `</div>
                                     <div>` + accountShipping.address_line_1 + ', ' + accountShipping.address_line_2 + `</div>
                                     <div>` + accountShipping.city + ' ' + accountShipping.postal_code + `</div>
                                     <div>` + accountShipping.state + `</div>
                                     <div>` + accountShipping.country + `</div>
                                     <div>` + accountShipping.phone.substring(0,2) + 'xxxxxxx' + accountShipping.phone.slice(-2) + `</div>
-                                    <div class="mt-1"><a href="javascript:void(0)" class="edit_delivery_address_for_account" data-id="` + accountShipping.id + `">Edit</a>` + deletionLink +  selectionLink + `</div>
+                                    <div class="mt-1">` + links + `</div>
                                 </div>
                             `);
                         });
                         $('#delivery_addresses_container').append(`
-                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address_for_account">Add New Address</button></div><div class="col d-grid"><button type="button" class="mod_button_2" id="cancel_change_delivery_address_for_account">Cancel</button></div></div>
+                            <div class="row mt-3"><div class="col d-grid"><button type="button" class="mod_button_1" id="add_delivery_address_for_account">Add New Address</button></div></div>
                         `);
                     }
                 },
@@ -663,7 +661,6 @@
                 success: function (result) {
                     console.log(result);
                     loadDeliveryAddressesForAccount();
-
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -682,16 +679,11 @@
                 success: function (result) {
                     console.log(result);
                     loadDeliveryAddressesForAccount();
-
                 },
                 error: function (xhr) {
                     console.log(xhr);
                 }
             });
-        });
-
-        $(document).on('click', '#change_delivery_address_for_account', function () {
-            loadDeliveryAddressesForAccount();
         });
 
         $(document).on('click', '#add_delivery_address_for_account', function () {
@@ -724,14 +716,8 @@
                     } else {
                         $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + userState + '"><label for="state">State</label></div>');
                     }
-                    $('#delivery_address_form_submit_button').parent().parent().before(`
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" value="" id="save_as_primary_delivery_address">
-                            <label class="form-check-label" for="save_as_primary_delivery_address">
-                                Save as Primary Address
-                            </label>
-                        </div>
-                    `);
+
+                    $('#delivery_address_form_submit_button_text').text('Save');
                     $('#delivery_address_form_container').show(1000);
                 },
                 error: function (xhr) {
@@ -786,17 +772,7 @@
                             $('#address_line_2').val(result.payload.address_line_2);
                             $('#phone').val(result.payload.phone);
                             $('#email').val(result.payload.email);
-                            if (result.payload.is_primary === 0) {
-                                $('#delivery_address_form_submit_button').parent().parent().before(`
-                                    <div class="form-check mb-4">
-                                        <input class="form-check-input" type="checkbox" value="" id="save_as_primary_delivery_address">
-                                        <label class="form-check-label" for="save_as_primary_delivery_address">
-                                            Save as Primary Address
-                                        </label>
-                                    </div>
-                                `);
-                            }
-
+                            $('#delivery_address_form_submit_button_text').text('Update');
                             $('#delivery_address_form_container').show(1000);
                         },
                         error: function (xhr) {
@@ -809,13 +785,33 @@
                     console.log(xhr);
                 }
             });
-
-
         });
 
 
-        $(document).on('click', '#edit_delivery_address_for_guest', function () {
+        function loadDeliveryAddressForGuest() {
+            $.ajax({
+                method: 'get',
+                url: '{{ url('checkout/get/guest/delivery/address') }}',
+                success: function (result) {
+                    console.log(result);
+                    $('#delivery_addresses_container').empty();
+                    $('#delivery_addresses_container').append(`
+                        <div>` + result.payload.first_name + ' ' + result.payload.last_name + `</div>
+                        <div>` + result.payload.address_line_1 + ', ' + result.payload.address_line_2 + `</div>
+                        <div>` + result.payload.city + ' ' + result.payload.postal_code + `</div>
+                        <div>` + result.payload.state + `</div>
+                        <div>` + result.payload.country + `</div>
+                        <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_delivery_address_for_guest">Edit</a></div>
+                    `);
+                },
+                error: function (xhr) {
+                    console.log(xhr)
+                }
+            });
+        }
 
+        $(document).on('click', '#edit_delivery_address_for_guest', function () {
             $.ajax({
                 method: 'get',
                 url: '{{ url('checkout/get/guest/delivery/address') }}',
@@ -824,13 +820,11 @@
                 },
                 success: function (result) {
                     console.log(result);
-                    $('#delivery_addresses_container').empty();
                     clearDeliveryAddressForm();
-
+                    $('#delivery_addresses_container').empty();
                     $('#first_name').val(result.payload.first_name);
                     $('#last_name').val(result.payload.last_name);
                     $('#country_id option:contains(' + result.payload.country + ')').attr('selected', true);
-
                     $.ajax({
                         method: 'get',
                         url: '{{ url('get/states/by/country/id') }}',
@@ -859,6 +853,7 @@
                             $('#address_line_2').val(result.payload.address_line_2);
                             $('#phone').val(result.payload.phone);
                             $('#email').val(result.payload.email);
+                            $('#delivery_address_form_submit_button_text').text('Update');
                             $('#delivery_address_form_container').show(1000);
                         },
                         error: function (xhr) {
@@ -876,65 +871,54 @@
         });
 
 
-        $(document).on('click', '#change_delivery_address_for_guest', function () {
-            $('#delivery_addresses_container').empty();
-            clearDeliveryAddressForm();
+        {{--$(document).on('click', '#change_delivery_address_for_guest', function () {--}}
+        {{--    $('#delivery_addresses_container').empty();--}}
+        {{--    clearDeliveryAddressForm();--}}
 
-            let userCountry = '{{ $userCountry }}';
-            let userState = '{{ $userState }}';
-            if (userCountry) {
-                $('#country_id option:contains(' + userCountry + ')').attr('selected', true);
-            }
-            $.ajax({
-                method: 'get',
-                url: '{{ url('get/states/by/country/id') }}',
-                data: {
-                    country_id: $('#country_id').val()
-                },
-                cache: false,
-                success: function (states) {
-                    console.log(states);
-                    $('#state_field_holder').empty();
-                    if (states.length > 0) {
-                        $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');
-                        $.each(states, function (key, state) {
-                            if (userState === state.state) {
-                                $('#state').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
-                            } else {
-                                $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');
-                            }
-                        });
-                    } else {
-                        $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + userState + '"><label for="state">State</label></div>');
-                    }
-                    $('#delivery_address_form_container').show(1000);
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
-
-
-
-        });
-
-
-
-
+        {{--    let userCountry = '{{ $userCountry }}';--}}
+        {{--    let userState = '{{ $userState }}';--}}
+        {{--    if (userCountry) {--}}
+        {{--        $('#country_id option:contains(' + userCountry + ')').attr('selected', true);--}}
+        {{--    }--}}
+        {{--    $.ajax({--}}
+        {{--        method: 'get',--}}
+        {{--        url: '{{ url('get/states/by/country/id') }}',--}}
+        {{--        data: {--}}
+        {{--            country_id: $('#country_id').val()--}}
+        {{--        },--}}
+        {{--        cache: false,--}}
+        {{--        success: function (states) {--}}
+        {{--            console.log(states);--}}
+        {{--            $('#state_field_holder').empty();--}}
+        {{--            if (states.length > 0) {--}}
+        {{--                $('#state_field_holder').append('<div class="form-floating"><select class="form-select" name="state" id="state"><option value="">Select State</option></select><label for="state">State</label></div>');--}}
+        {{--                $.each(states, function (key, state) {--}}
+        {{--                    if (userState === state.state) {--}}
+        {{--                        $('#state').append('<option value="' + state.state + '" selected>' + state.state + '</option>');--}}
+        {{--                    } else {--}}
+        {{--                        $('#state').append('<option value="' + state.state + '">' + state.state + '</option>');--}}
+        {{--                    }--}}
+        {{--                });--}}
+        {{--            } else {--}}
+        {{--                $('#state_field_holder').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state" placeholder="State" value="' + userState + '"><label for="state">State</label></div>');--}}
+        {{--            }--}}
+        {{--            $('#delivery_address_form_container').show(1000);--}}
+        {{--        },--}}
+        {{--        error: function (xhr) {--}}
+        {{--            console.log(xhr);--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
 
         $(document).on('submit', '#delivery_address_form', function (event) {
             event.preventDefault();
             $('#delivery_address_form').find('.invalid-feedback').remove();
             $('#delivery_address_form').find('.is-invalid').removeClass('is-invalid');
-
             $('#delivery_address_form_submit_button').addClass('disabled');
             $('#delivery_address_form_submit_button_text').addClass('sr-only');
             $('#delivery_address_form_submit_button_processing').removeClass('sr-only');
             let formData = new FormData(this);
             formData.append('_token', '{{ csrf_token() }}');
-            if ($('#save_as_primary_delivery_address').length > 0) {
-                formData.append('is_primary', $('#save_as_primary_delivery_address').prop('checked'));
-            }
             let isGuest = '{{ $isGuest }}';
             let url = isGuest ? '{{ url('checkout/save/guest/delivery/address') }}' : '{{ url('checkout/save/account/delivery/address') }}';
             $.ajax({
@@ -964,7 +948,6 @@
                     $('#delivery_address_form_submit_button_text').removeClass('sr-only');
                     $('#delivery_address_form_submit_button_processing').addClass('sr-only');
                     if (xhr.responseJSON.hasOwnProperty('errors')) {
-
                         $.each(xhr.responseJSON.errors, function (key, value) {
                             $('#' + key).after('<div class="invalid-feedback"></div>');
                             $('#' + key).addClass('is-invalid');
@@ -975,15 +958,6 @@
                     }
                 }
             });
-
-        });
-
-
-
-        $(document).on('click', '#cancel_change_delivery_address_for_account', function () {
-            clearDeliveryAddressForm();
-            $('#delivery_address_form_container').hide(1000);
-            loadDeliveryAddressForAccount();
         });
 
         $(document).on('click', '#delivery_address_form_cancel_button', function () {
@@ -1040,8 +1014,6 @@
             $('#billing_address_form')[0].reset();
         }
 
-
-
         function loadBillingAddressForAccount() {
             $.ajax({
                 method: 'get',
@@ -1056,7 +1028,7 @@
                         <div>` + result.payload.state + `</div>
                         <div>` + result.payload.country + `</div>
                         <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_account" data-id="` + result.payload.id + `">Edit</a> | <a href="javascript:void(0)" id="change_billing_address_for_account" data-id="` + result.payload.id + `">Change</a></div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_account" data-id="` + result.payload.id + `">Edit</a></div>
                     `);
                 },
                 error: function (xhr) {
@@ -1079,7 +1051,7 @@
                         <div>` + result.payload.state + `</div>
                         <div>` + result.payload.country + `</div>
                         <div>` + result.payload.phone.substring(0,2) + 'xxxxxxx' + result.payload.phone.slice(-2) + `</div>
-                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_guest">Edit</a> | <a href="javascript:void(0)" id="change_billing_address_for_guest">Change</a></div>
+                        <div class="mt-3"><a href="javascript:void(0)" id="edit_billing_address_for_guest">Edit</a></div>
                     `);
                 },
                 error: function (xhr) {
@@ -1090,7 +1062,6 @@
 
 
         $(document).on('click', '#edit_billing_address_for_account', function () {
-
             $.ajax({
                 method: 'get',
                 url: '{{ url('checkout/get/account/billing/address/by/id') }}',
@@ -1099,14 +1070,12 @@
                 },
                 success: function (result) {
                     console.log(result);
-                    $('#billing_address_container').empty();
                     clearBillingAddressForm();
-
+                    $('#billing_address_container').empty();
                     $('#billing_address_form').append('<input type="hidden" name="id" id="id_for_billing" value="' + result.payload.id + '">');
                     $('#first_name_for_billing').val(result.payload.first_name);
                     $('#last_name_for_billing').val(result.payload.last_name);
                     $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
-
                     $.ajax({
                         method: 'get',
                         url: '{{ url('get/states/by/country/id') }}',
@@ -1135,6 +1104,7 @@
                             $('#address_line_2_for_billing').val(result.payload.address_line_2);
                             $('#phone_for_billing').val(result.payload.phone);
                             $('#email_for_billing').val(result.payload.email);
+                            $('#billing_address_form_submit_button_text').text('Update');
                             $('#billing_address_form_container').show(1000);
                         },
                         error: function (xhr) {
@@ -1153,7 +1123,6 @@
 
 
         $(document).on('click', '#edit_billing_address_for_guest', function () {
-
             $.ajax({
                 method: 'get',
                 url: '{{ url('checkout/get/guest/billing/address') }}',
@@ -1162,13 +1131,11 @@
                 },
                 success: function (result) {
                     console.log(result);
-                    $('#billing_address_container').empty();
                     clearBillingAddressForm();
-
+                    $('#billing_address_container').empty();
                     $('#first_name_for_billing').val(result.payload.first_name);
                     $('#last_name_for_billing').val(result.payload.last_name);
                     $('#country_id_for_billing option:contains(' + result.payload.country + ')').attr('selected', true);
-
                     $.ajax({
                         method: 'get',
                         url: '{{ url('get/states/by/country/id') }}',
@@ -1197,6 +1164,7 @@
                             $('#address_line_2_for_billing').val(result.payload.address_line_2);
                             $('#phone_for_billing').val(result.payload.phone);
                             $('#email_for_billing').val(result.payload.email);
+                            $('#billing_address_form_submit_button_text').text('Update');
                             $('#billing_address_form_container').show(1000);
                         },
                         error: function (xhr) {
@@ -1214,88 +1182,88 @@
         });
 
 
-        $(document).on('click', '#change_billing_address_for_account', function () {
-            $('#billing_address_container').empty();
-            clearBillingAddressForm();
+        {{--$(document).on('click', '#change_billing_address_for_account', function () {--}}
+        {{--    $('#billing_address_container').empty();--}}
+        {{--    clearBillingAddressForm();--}}
 
-            $('#billing_address_form').append('<input type="hidden" name="id" id="id_for_billing" value="' + $(this).data('id') + '">');
+        {{--    $('#billing_address_form').append('<input type="hidden" name="id" id="id_for_billing" value="' + $(this).data('id') + '">');--}}
 
-            let userCountry = '{{ $userCountry }}';
-            let userState = '{{ $userState }}';
-            if (userCountry) {
-                $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);
-            }
-            $.ajax({
-                method: 'get',
-                url: '{{ url('get/states/by/country/id') }}',
-                data: {
-                    country_id: $('#country_id_for_billing').val()
-                },
-                cache: false,
-                success: function (states) {
-                    console.log(states);
-                    $('#state_field_holder_for_billing').empty();
-                    if (states.length > 0) {
-                        $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
-                        $.each(states, function (key, state) {
-                            if (userState === state.state) {
-                                $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
-                            } else {
-                                $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
-                            }
-                        });
-                    } else {
-                        $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
-                    }
-                    $('#billing_address_form_container').show(1000);
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
+        {{--    let userCountry = '{{ $userCountry }}';--}}
+        {{--    let userState = '{{ $userState }}';--}}
+        {{--    if (userCountry) {--}}
+        {{--        $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);--}}
+        {{--    }--}}
+        {{--    $.ajax({--}}
+        {{--        method: 'get',--}}
+        {{--        url: '{{ url('get/states/by/country/id') }}',--}}
+        {{--        data: {--}}
+        {{--            country_id: $('#country_id_for_billing').val()--}}
+        {{--        },--}}
+        {{--        cache: false,--}}
+        {{--        success: function (states) {--}}
+        {{--            console.log(states);--}}
+        {{--            $('#state_field_holder_for_billing').empty();--}}
+        {{--            if (states.length > 0) {--}}
+        {{--                $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');--}}
+        {{--                $.each(states, function (key, state) {--}}
+        {{--                    if (userState === state.state) {--}}
+        {{--                        $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');--}}
+        {{--                    } else {--}}
+        {{--                        $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');--}}
+        {{--                    }--}}
+        {{--                });--}}
+        {{--            } else {--}}
+        {{--                $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');--}}
+        {{--            }--}}
+        {{--            $('#billing_address_form_container').show(1000);--}}
+        {{--        },--}}
+        {{--        error: function (xhr) {--}}
+        {{--            console.log(xhr);--}}
+        {{--        }--}}
+        {{--    });--}}
 
 
 
-        });
+        {{--});--}}
 
-        $(document).on('click', '#change_billing_address_for_guest', function () {
-            $('#billing_address_container').empty();
-            clearBillingAddressForm();
+        {{--$(document).on('click', '#change_billing_address_for_guest', function () {--}}
+        {{--    $('#billing_address_container').empty();--}}
+        {{--    clearBillingAddressForm();--}}
 
-            let userCountry = '{{ $userCountry }}';
-            let userState = '{{ $userState }}';
-            if (userCountry) {
-                $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);
-            }
-            $.ajax({
-                method: 'get',
-                url: '{{ url('get/states/by/country/id') }}',
-                data: {
-                    country_id: $('#country_id_for_billing').val()
-                },
-                cache: false,
-                success: function (states) {
-                    console.log(states);
-                    $('#state_field_holder_for_billing').empty();
-                    if (states.length > 0) {
-                        $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');
-                        $.each(states, function (key, state) {
-                            if (userState === state.state) {
-                                $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');
-                            } else {
-                                $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');
-                            }
-                        });
-                    } else {
-                        $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');
-                    }
-                    $('#billing_address_form_container').show(1000);
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
-        });
+        {{--    let userCountry = '{{ $userCountry }}';--}}
+        {{--    let userState = '{{ $userState }}';--}}
+        {{--    if (userCountry) {--}}
+        {{--        $('#country_id_for_billing option:contains(' + userCountry + ')').attr('selected', true);--}}
+        {{--    }--}}
+        {{--    $.ajax({--}}
+        {{--        method: 'get',--}}
+        {{--        url: '{{ url('get/states/by/country/id') }}',--}}
+        {{--        data: {--}}
+        {{--            country_id: $('#country_id_for_billing').val()--}}
+        {{--        },--}}
+        {{--        cache: false,--}}
+        {{--        success: function (states) {--}}
+        {{--            console.log(states);--}}
+        {{--            $('#state_field_holder_for_billing').empty();--}}
+        {{--            if (states.length > 0) {--}}
+        {{--                $('#state_field_holder_for_billing').append('<div class="form-floating"><select class="form-select" name="state" id="state_for_billing"><option value="">Select State</option></select><label for="state_for_billing">State</label></div>');--}}
+        {{--                $.each(states, function (key, state) {--}}
+        {{--                    if (userState === state.state) {--}}
+        {{--                        $('#state_for_billing').append('<option value="' + state.state + '" selected>' + state.state + '</option>');--}}
+        {{--                    } else {--}}
+        {{--                        $('#state_for_billing').append('<option value="' + state.state + '">' + state.state + '</option>');--}}
+        {{--                    }--}}
+        {{--                });--}}
+        {{--            } else {--}}
+        {{--                $('#state_field_holder_for_billing').append('<div class="form-floating"><input type="text" class="form-control" name="state" id="state_for_billing" placeholder="State" value="' + userState + '"><label for="state_for_billing">State</label></div>');--}}
+        {{--            }--}}
+        {{--            $('#billing_address_form_container').show(1000);--}}
+        {{--        },--}}
+        {{--        error: function (xhr) {--}}
+        {{--            console.log(xhr);--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
 
 
 
@@ -1304,10 +1272,8 @@
 
         $(document).on('submit', '#billing_address_form', function (event) {
             event.preventDefault();
-
             $('#billing_address_form').find('.invalid-feedback').remove();
             $('#billing_address_form').find('.is-invalid').removeClass('is-invalid');
-
             $('#billing_address_form_submit_button').addClass('disabled');
             $('#billing_address_form_submit_button_text').addClass('sr-only');
             $('#billing_address_form_submit_button_processing').removeClass('sr-only');
@@ -1329,15 +1295,13 @@
                     $('#billing_address_form_submit_button').removeClass('disabled');
                     $('#billing_address_form_submit_button_text').removeClass('sr-only');
                     $('#billing_address_form_submit_button_processing').addClass('sr-only');
-                    clearBillingAddressForm();
                     $('#billing_address_form_container').hide(1000);
-
+                    clearBillingAddressForm();
                     if (isGuest) {
                         loadBillingAddressForGuest();
                     } else {
                         loadBillingAddressForAccount();
                     }
-
                 },
                 error: function (xhr) {
                     console.log(xhr);
@@ -1345,7 +1309,6 @@
                     $('#billing_address_form_submit_button_text').removeClass('sr-only');
                     $('#billing_address_form_submit_button_processing').addClass('sr-only');
                     if (xhr.responseJSON.hasOwnProperty('errors')) {
-
                         $.each(xhr.responseJSON.errors, function (key, value) {
                             $('#' + key + '_for_billing').after('<div class="invalid-feedback"></div>');
                             $('#' + key + '_for_billing').addClass('is-invalid');
@@ -1373,26 +1336,6 @@
 
         //////////////////////////////////////////////////////Billing Section End//////////////////////////////////////////////////////////
 
-
-
-        $(document).ready(function () {
-
-            let isGuest = '{{ $isGuest }}';
-            loadCheckoutItems();
-
-            if (isGuest) {
-                loadDeliveryAddressForGuest();
-                loadBillingAddressForGuest();
-            } else {
-                loadDeliveryAddressForAccount();
-                loadBillingAddressForAccount();
-            }
-
-            $('#delivery_address_form_container').hide();
-            $('#billing_address_form_container').hide();
-            $('#cards_container').hide();
-            $('#card_form_container').hide();
-        });
 
         function clearCardForm() {
             $('#card_form').find('.invalid-feedback').remove();
@@ -1661,17 +1604,12 @@
                             $.each(result.payload, function (key, card) {
                                 cardBrandImagePath = card.card_brand === 'Visa' ? '{{ asset('storage/img/application/visa-card.png') }}' : (card.card_brand === 'American Express' ? '{{ asset('storage/img/application/american-express-card.png') }}' : (card.card_brand === 'MasterCard' ? '{{ asset('storage/img/application/master-card.png') }}' : (card.card_brand === 'Discover' ? '{{ asset('storage/img/application/discover-card.png') }}' : '')));
                                 cardNumberLast4Digits = card.card_number.substr(-4);
+                                cardLinks = parseInt(card.is_selected) === 1 ? '<a href="javascript:void(0)" class="edit_card_for_account" data-id="' + card.id + '">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a>' : '<a href="javascript:void(0)" class="edit_card_for_account" data-id="' + card.id + '">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a> | <a href="javascript:void(0)" class="select_card_for_account" data-id="' + card.id + '">Select</a>';
+                                selectedCardColor = parseInt(card.is_selected) === 1 ? 'ghostwhite' : 'white';
+                                selectedText = parseInt(card.is_selected) === 1 ? '<div style="position: absolute; left: 0; top: 0; background-color: #37bd4b; border-radius: 5px; color: white; padding: 2px 5px;">Selected for Checkout</div>' : '';
                                 if (parseInt(card.is_selected) === 1) {
                                     selectedCardLast4Digits = card.card_number.substr(-4);
-                                    cardLinks = '<a href="javascript:void(0)" class="edit_card_for_account" data-id="' + card.id + '">Edit</a> | <a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a>';
-                                    selectedCardColor = 'ghostwhite';
-                                    selectedText = '<div style="position: absolute; left: 0; top: 0; background-color: darkblue; border-radius: 5px; color: white; padding: 2px 5px;">Selected</div>'
-                                } else {
-                                    cardLinks = '<a href="javascript:void(0)" class="delete_card_from_account" data-id="' + card.id + '">Delete</a> | <a href="javascript:void(0)" class="select_card_for_account" data-id="' + card.id + '">Select</a>';
-                                    selectedCardColor = 'white';
-                                    selectedText = '';
                                 }
-
                                 $('#cards_container').append(`
                                     <div class="ps-xxl-4 ps-xl-4 ps-lg-4 ps-md-4 ps-sm-4 p-0">
                                         <div class="card mb-4" style="background-color: ` + selectedCardColor + `">
@@ -1717,7 +1655,10 @@
                                 `);
                             });
                         }
-                        $('#cards_container').append('<div class="mt-4 ps-4 d-grid"><button type="button" class="mod_button_1" id="add_card_for_account">Add New Card</button></div>');
+                        if (result.payload.length < 3) {
+                            $('#cards_container').append('<div class="mt-4 ps-4 d-grid"><button type="button" class="mod_button_1" id="add_card_for_account">Add New Card</button></div>');
+                        }
+
                         $('#cards_container').show(1000);
                         $('#payment_option_message').removeClass('text-danger').addClass('text-success').text('You will Finish Checkout with Card ending in ' + selectedCardLast4Digits);
                         $('#place_order_button_text').text('Place Order');
